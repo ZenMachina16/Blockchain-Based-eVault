@@ -8,10 +8,10 @@ require("dotenv").config();
 const pinataJwt = process.env.PINATA_JWT;
 const pinataGateway = process.env.GATEWAY_URL;
 
-async function uploadToPinata() {
+async function uploadToPinata(fileStream, fileName) {
   try {
     const form = new FormData();
-    form.append("file", fs.createReadStream("./hello-world.txt"));
+    form.append("file", fileStream, fileName); // Add the file stream and filename to the form
 
     const response = await axios.post(`https://api.pinata.cloud/pinning/pinFileToIPFS`, form, {
       headers: {
@@ -24,6 +24,7 @@ async function uploadToPinata() {
     return response.data.IpfsHash;
   } catch (error) {
     console.error("Error uploading file:", error);
+    throw error;
   }
 }
 
@@ -36,10 +37,8 @@ async function fetchFromPinata(ipfsHash) {
   }
 }
 
-// Example usage
-(async () => {
-  const ipfsHash = await uploadToPinata();
-  if (ipfsHash) {
-    await fetchFromPinata(ipfsHash);
-  }
-})();
+module.exports = {
+  uploadToPinata,
+  fetchFromPinata
+};
+
