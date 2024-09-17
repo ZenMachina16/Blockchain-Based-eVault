@@ -1,11 +1,8 @@
-// scripts/getHashFromContract.js
-
 const { ethers } = require("hardhat");
 require("dotenv").config();
 
 async function main() {
     const [deployer] = await ethers.getSigners();
-    console.log("Fetching document hash with the account:", deployer.address);
 
     // Load your contract
     const DocumentStorage = await ethers.getContractFactory("DocumentStorage");
@@ -13,15 +10,13 @@ async function main() {
 
     // Fetch the document hash for the deployer's address
     const documentHash = await documentStorage.getDocumentHash(deployer.address);
-    
-    if (documentHash) {
-        console.log("Fetched document hash:", documentHash);
-    } else {
-        console.log("No document hash found for this address.");
-    }
+
+    // Output JSON directly
+    console.log(JSON.stringify({ documentHash: documentHash || null }));
 }
 
 main().catch((error) => {
-    console.error("Error:", error);
+    // Output errors in JSON format
+    console.error(JSON.stringify({ error: error.message }));
     process.exitCode = 1;
 });
