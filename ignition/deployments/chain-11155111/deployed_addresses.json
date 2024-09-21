@@ -1,3 +1,5 @@
 {
-  "DocumentStorageModule#DocumentStorage": "0x562960c11f2638565cB22D808B79a24f139d5383"
+  "DocumentStorageModule#DocumentStorage": "0x562960c11f2638565cB22D808B79a24f139d5383",
+  "EVaultModule#EVault": "0x5c54B6A96F5A68d6a4cF887f33490B77DfEdd4d2",
+  "NewEVaultModule#NewEVault": "0xe530d0463bC6eF7E0465013f25EdAFA61926B6D4"
 }
