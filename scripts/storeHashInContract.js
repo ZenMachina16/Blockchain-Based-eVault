@@ -6,24 +6,50 @@ const uploadFileToPinata = require("./pinataIntegration");
 
 async function main() {
     const [deployer] = await ethers.getSigners();
-    console.log("Storing hash with the account:", deployer.address);
+    console.log("Using account:", deployer.address);
 
     // Upload the file to Pinata and get the IPFS hash
     const ipfsHash = await uploadFileToPinata(); // Get the IPFS hash from Pinata
     console.log("IPFS Hash from Pinata:", ipfsHash);
 
     // Load your contract
-    const DocumentStorage = await ethers.getContractFactory("DocumentStorage");
-    const documentStorage = await DocumentStorage.attach(process.env.CONTRACT_ADDRESS); 
+    const EVault = await ethers.getContractFactory("EVault");
+    const eVault = await EVault.attach(process.env.NEWEWEVAULT_CONTRACT_ADDRESS);
 
-    // Store the IPFS hash in the smart contract
-    console.log("Calling uploadDocument with IPFS hash:", ipfsHash);
-    const tx = await documentStorage.uploadDocument(ipfsHash);
+    // Prepare metadata to be stored
+    const title = "Successful Case"; // Fixed typo
+    const dateOfJudgment = "2024-09-21"; // Example date
+    const caseNumber = "C-12346"; // Example case number
+    const category = "Civil"; // Example category
+    const judgeName = "Judge John Doe"; // Example judge name
+
+    // Log the metadata being uploaded
+    console.log("Uploading with metadata:", {
+        ipfsHash,
+        title,
+        dateOfJudgment,
+        caseNumber,
+        category,
+        judgeName
+    });
+    
+    // Store the IPFS hash and metadata in the smart contract
+    console.log("Calling uploadFile with IPFS hash and metadata...");
+    
+    const tx = await eVault.uploadFile(
+        ipfsHash,
+        title,
+        dateOfJudgment,
+        caseNumber,
+        category,
+        judgeName,
+        { gasLimit: 50000000 } // Adjust gas limit as needed
+    );
+
     console.log("Transaction sent. Hash:", tx.hash);
-
     const receipt = await tx.wait();
     console.log("Transaction mined in block:", receipt.blockNumber);
-    console.log("Document hash stored successfully!");
+    console.log("Document hash and metadata stored successfully!");
 }
 
 main().catch((error) => {
