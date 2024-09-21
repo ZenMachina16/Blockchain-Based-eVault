@@ -11,3 +11,8 @@ Contract Local Deployment : npx hardhat node
 
 Contract Deployment on Sepolia : npx hardhat ignition deploy ignition/modules/EVaultModule.js --network sepolia
 
+
+
+NewEvault Contract Address on Sepolia Test network : 0xe530d0463bC6eF7E0465013f25EdAFA61926B6D4
+
+NewEvault Contract is the Contract to be used , deployed on sepolia

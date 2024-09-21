@@ -5,14 +5,24 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     // Load your contract
-    const DocumentStorage = await ethers.getContractFactory("DocumentStorage");
-    const documentStorage = await DocumentStorage.attach(process.env.CONTRACT_ADDRESS); // Ensure CONTRACT_ADDRESS is in .env
+    const EVault = await ethers.getContractFactory("EVault");
+    const eVault = await EVault.attach(process.env.NEWEVAULT_CONTRACT_ADDRESS); // Ensure EVAULT_CONTRACT_ADDRESS is in .env
 
-    // Fetch the document hash for the deployer's address
-    const documentHash = await documentStorage.getDocumentHash(deployer.address);
+    // Example: Fetch the document with fileId = 1 (you can change this dynamically)
+    const fileId = 1; // Replace with the actual fileId you want to fetch
+    const caseFile = await eVault.caseFiles(fileId);
 
-    // Output JSON directly
-    console.log(JSON.stringify({ documentHash: documentHash || null }));
+    // Output JSON with document details
+    console.log(JSON.stringify({
+        uploader: caseFile.uploader,
+        ipfsHash: caseFile.ipfsHash,
+        title: caseFile.title,
+        dateOfJudgment: caseFile.dateOfJudgment,
+        caseNumber: caseFile.caseNumber,
+        category: caseFile.category,
+        judgeName: caseFile.judgeName,
+        timestamp: caseFile.timestamp
+    }));
 }
 
 main().catch((error) => {
