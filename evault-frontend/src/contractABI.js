@@ -1,10 +1,29 @@
 // src/contractABI.js
 
-export const DocumentStorageABI = [
+export const NavinEvaultABI =  [
   {
     "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fileId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "client",
+        "type": "address"
+      }
+    ],
+    "name": "ClientLinked",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -62,6 +81,12 @@ export const DocumentStorageABI = [
         "internalType": "uint256",
         "name": "timestamp",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "linkedClients",
+        "type": "address[]"
       }
     ],
     "name": "FileUploaded",
@@ -137,12 +162,113 @@ export const DocumentStorageABI = [
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getFile",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "uploader",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "dateOfJudgment",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "caseNumber",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "judgeName",
+        "type": "string"
+      },
+      {
+        "internalType": "address[]",
+        "name": "linkedClients",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_official",
         "type": "address"
       }
     ],
     "name": "isCourtOfficial",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_clients",
+        "type": "address[]"
+      }
+    ],
+    "name": "linkClients",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "linkedClientsMap",
     "outputs": [
       {
         "internalType": "bool",
@@ -190,9 +316,56 @@ export const DocumentStorageABI = [
     "name": "searchByTitle",
     "outputs": [
       {
-        "internalType": "uint256[]",
+        "components": [
+          {
+            "internalType": "address",
+            "name": "uploader",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "dateOfJudgment",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "caseNumber",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "judgeName",
+            "type": "string"
+          },
+          {
+            "internalType": "address[]",
+            "name": "linkedClients",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct NavinEvault.CaseFile[]",
         "name": "",
-        "type": "uint256[]"
+        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",
@@ -242,6 +415,11 @@ export const DocumentStorageABI = [
         "internalType": "string",
         "name": "_judgeName",
         "type": "string"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_linkedClients",
+        "type": "address[]"
       }
     ],
     "name": "uploadFile",

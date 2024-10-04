@@ -1,3 +1,4 @@
+// getHashFromContract.js
 const { ethers } = require("hardhat");
 require("dotenv").config();
 
@@ -5,28 +6,24 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     // Load your contract
-    const EVault = await ethers.getContractFactory("EVault");
-    const eVault = await EVault.attach(process.env.NEWEVAULT_CONTRACT_ADDRESS); // Ensure EVAULT_CONTRACT_ADDRESS is in .env
+    const EVault = await ethers.getContractFactory("NavinEvault");
+    const eVault = await EVault.attach(process.env.NAVINEVAULT_CONTRACT_ADDRESS);
 
-    // Example: Fetch the document with fileId = 1 (you can change this dynamically)
-    const fileId = 1; // Replace with the actual fileId you want to fetch
-    const caseFile = await eVault.caseFiles(fileId);
+    const fileId = 1;  // Replace with actual file ID
+    const caseFile = await eVault.getFile(fileId);
 
-    // Output JSON with document details
-    console.log(JSON.stringify({
-        uploader: caseFile.uploader,
-        ipfsHash: caseFile.ipfsHash,
-        title: caseFile.title,
-        dateOfJudgment: caseFile.dateOfJudgment,
-        caseNumber: caseFile.caseNumber,
-        category: caseFile.category,
-        judgeName: caseFile.judgeName,
-        timestamp: caseFile.timestamp
-    }));
+    console.log(`File ID: ${fileId}`);
+    console.log(`Title: ${caseFile.title}`);
+    console.log(`IPFS Hash: ${caseFile.ipfsHash}`);
+    console.log(`Uploader: ${caseFile.uploader}`);
+    console.log(`Date of Judgment: ${caseFile.dateOfJudgment}`);
+    console.log(`Case Number: ${caseFile.caseNumber}`);
+    console.log(`Category: ${caseFile.category}`);
+    console.log(`Judge Name: ${caseFile.judgeName}`);
+    console.log(`Linked Clients: ${caseFile.linkedClients}`);
 }
 
 main().catch((error) => {
-    // Output errors in JSON format
-    console.error(JSON.stringify({ error: error.message }));
+    console.error("Error:", error);
     process.exitCode = 1;
 });

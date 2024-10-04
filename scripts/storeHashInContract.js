@@ -2,22 +2,22 @@
 
 const { ethers } = require("hardhat");
 require("dotenv").config();
-const uploadFileToPinata = require("./pinataIntegration");
+const { uploadToPinata } = require("./pinataIntegration"); // Ensure this is the correct import
 
 async function main() {
     const [deployer] = await ethers.getSigners();
     console.log("Using account:", deployer.address);
 
     // Upload the file to Pinata and get the IPFS hash
-    const ipfsHash = await uploadFileToPinata(); // Get the IPFS hash from Pinata
+    const ipfsHash = await uploadToPinata(); // Get the IPFS hash from Pinata
     console.log("IPFS Hash from Pinata:", ipfsHash);
 
     // Load your contract
-    const EVault = await ethers.getContractFactory("EVault");
-    const eVault = await EVault.attach(process.env.NEWEWEVAULT_CONTRACT_ADDRESS);
+    const EVault = await ethers.getContractFactory("NavinEvault"); // Ensure this matches your contract name
+    const eVault = await EVault.attach(process.env.NAVINEVAULT_CONTRACT_ADDRESS); // Use your contract's address here
 
     // Prepare metadata to be stored
-    const title = "Successful Case"; // Fixed typo
+    const title = "Successful Case"; // Example title
     const dateOfJudgment = "2024-09-21"; // Example date
     const caseNumber = "C-12346"; // Example case number
     const category = "Civil"; // Example category
@@ -35,7 +35,7 @@ async function main() {
     
     // Store the IPFS hash and metadata in the smart contract
     console.log("Calling uploadFile with IPFS hash and metadata...");
-    
+
     const tx = await eVault.uploadFile(
         ipfsHash,
         title,
