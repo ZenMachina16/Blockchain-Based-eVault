@@ -1,21 +1,21 @@
-// scripts/addCourtOfficial.js
-const { ethers } = require("hardhat");
-require("dotenv").config();
+require('dotenv').config(); // Load environment variables
+const hre = require("hardhat");
 
-async function addCourtOfficial(courtOfficialAddress) {
-    const [deployer] = await ethers.getSigners();
-    console.log("Using account:", deployer.address);
+async function main() {
+  const contractAddress = process.env.NAVINEVAULT_CONTRACT_ADDRESS; // Read from .env
+  const [owner, lawyer] = await hre.ethers.getSigners(); // Using second account as lawyer
 
-    // Load your contract
-    const EVault = await ethers.getContractFactory("NavinEvault");
-    const eVault = await EVault.attach(process.env.NAVINEVAULT_CONTRACT_ADDRESS);
+  const NavinEvault = await hre.ethers.getContractAt("NavinEvault", contractAddress);
 
-    // Add court official
-    const tx = await eVault.addCourtOfficial(courtOfficialAddress);
-    console.log("Transaction sent. Hash:", tx.hash);
-    const receipt = await tx.wait();
-    console.log("Transaction mined in block:", receipt.blockNumber);
-    return `Account ${courtOfficialAddress} added as court official successfully!`;
+  const tx = await NavinEvault.addCourtOfficial(lawyer.address);
+  await tx.wait();
+
+  console.log(`Added court official: ${lawyer.address}`);
 }
 
-module.exports = addCourtOfficial;
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
