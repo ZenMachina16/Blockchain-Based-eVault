@@ -6,7 +6,7 @@ const path = require('path');
 const { exec } = require('child_process');
 require('dotenv').config();
 
-const { uploadToPinata } = require('../scripts/pinataIntegration'); // Import the function
+const { uploadToPinata } = require('../scripts/pinataIntegration'); // Import the Pinata upload function
 
 const app = express(); // Initialize the app
 const PORT = 5000;
@@ -41,6 +41,7 @@ app.post('/upload', (req, res) => {
       // Clean up temporary file
       fs.unlinkSync(filePath);
 
+      // Return the IPFS hash
       res.json({ ipfsHash });
     } catch (error) {
       console.error('Error uploading file to Pinata:', error);
@@ -49,13 +50,15 @@ app.post('/upload', (req, res) => {
   });
 });
 
-// Endpoint to fetch document hash from the smart contract
-const scriptPath = path.resolve(__dirname, '../scripts/getHashFromContract.js');
-app.get('/document-hash', (req, res) => {
-  exec(`npx hardhat run ${scriptPath} --network sepolia`, (error, stdout, stderr) => {
+// Endpoint to fetch document details from the smart contract
+app.get('/document/:fileId', (req, res) => {
+  const fileId = req.params.fileId; // Get the file ID from URL parameters
+  const scriptPath = path.resolve(__dirname, '../scripts/getDocumentDetails.js'); // Your script's path
+
+  exec(`npx hardhat run ${scriptPath} --network localhost ${fileId}`, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error executing script: ${error}`);
-      return res.status(500).json({ error: 'Failed to fetch document hash' });
+      return res.status(500).json({ error: 'Failed to fetch document details' });
     }
 
     if (stderr) {
@@ -68,7 +71,7 @@ app.get('/document-hash', (req, res) => {
       res.json(result);
     } catch (parseError) {
       console.error(`Error parsing script output: ${parseError}`);
-      res.status(500).json({ error: 'Failed to parse document hash' });
+      res.status(500).json({ error: 'Failed to parse document details' });
     }
   });
 });

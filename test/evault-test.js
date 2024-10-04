@@ -1,137 +1,108 @@
-const {
-  loadFixture,
-} = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 const { expect } = require("chai");
+const { ethers } = require("hardhat");
 
-describe("EVault", function () {
-  // Fixture to deploy the EVault contract and set up initial state
-  async function deployEVaultFixture() {
-    const [owner, lawyer, client, otherAccount] = await ethers.getSigners();
+describe("kevault", function () {
+  let kevault, contractInstance, owner, courtOfficial, client1, client2;
 
-    const EVault = await ethers.getContractFactory("EVault");
-    const evault = await EVault.deploy();
-
-    // Add lawyer and client as court officials
-    await evault.addCourtOfficial(lawyer.address);
-    await evault.addCourtOfficial(client.address);
-
-    return { evault, owner, lawyer, client, otherAccount };
-  }
-
-  describe("Deployment", function () {
-    it("Should set the right owner", async function () {
-      const { evault, owner } = await loadFixture(deployEVaultFixture);
-      expect(await evault.owner()).to.equal(owner.address);
-    });
+  beforeEach(async function () {
+    [owner, courtOfficial, client1, client2] = await ethers.getSigners();
+    kevault = await ethers.getContractFactory("kevault");
+    contractInstance = await kevault.deploy();
+    await contractInstance.deployed();
   });
 
-  describe("Court Official Functions", function () {
-    it("Should verify if an address is a court official", async function () {
-      const { evault, lawyer, otherAccount } = await loadFixture(deployEVaultFixture);
-      expect(await evault.isCourtOfficial(lawyer.address)).to.equal(true); // Changed to use isCourtOfficial
-      expect(await evault.isCourtOfficial(otherAccount.address)).to.equal(false); // Changed to use isCourtOfficial
-    });
-
-    it("Should allow owner to add a court official", async function () {
-      const { evault, owner, otherAccount } = await loadFixture(deployEVaultFixture);
-      await evault.connect(owner).addCourtOfficial(otherAccount.address);
-      expect(await evault.isCourtOfficial(otherAccount.address)).to.equal(true); // Changed to use isCourtOfficial
-    });
-
-    it("Should allow owner to remove a court official", async function () {
-      const { evault, owner, lawyer } = await loadFixture(deployEVaultFixture);
-      await evault.connect(owner).removeCourtOfficial(lawyer.address);
-      expect(await evault.isCourtOfficial(lawyer.address)).to.equal(false); // Changed to use isCourtOfficial
-    });
+  it("Should verify if an address is a court official", async function () {
+    const result = await contractInstance.isCourtOfficial(courtOfficial.address);
+    expect(result).to.be.false;
   });
 
-  describe("File Upload", function () {
-    it("Should upload a file successfully by a court official", async function () {
-      const { evault, lawyer } = await loadFixture(deployEVaultFixture);
-
-      await evault.connect(lawyer).uploadFile(
-        "QmSomeIpfsHash",
-        "Case Title",
-        "2024-09-17",
-        "Case123",
-        "Criminal",
-        "Judge Doe"
-      );
-
-      expect(await evault.totalCaseFiles()).to.equal(1);
-    });
-
-    it("Should fail if a non-court official tries to upload a file", async function () {
-      const { evault, otherAccount } = await loadFixture(deployEVaultFixture);
-
-      await expect(
-        evault.connect(otherAccount).uploadFile(
-          "QmSomeIpfsHash",
-          "Case Title",
-          "2024-09-17",
-          "Case123",
-          "Criminal",
-          "Judge Doe"
-        )
-      ).to.be.revertedWith("Only court officials can upload files");
-    });
-
-    it("Should fail if required file fields are missing", async function () {
-      const { evault, lawyer } = await loadFixture(deployEVaultFixture);
-
-      await expect(
-        evault.connect(lawyer).uploadFile(
-          "", // Missing IPFS hash
-          "Case Title",
-          "2024-09-17",
-          "Case123",
-          "Criminal",
-          "Judge Doe"
-        )
-      ).to.be.revertedWith("IPFS hash is required");
-    });
+  it("Should allow the owner to add a court official", async function () {
+    await contractInstance.addCourtOfficial(courtOfficial.address);
+    const result = await contractInstance.isCourtOfficial(courtOfficial.address);
+    expect(result).to.be.true;
   });
 
-  describe("Search Functions", function () {
-    it("Should return the correct case file when searching by title", async function () {
-      const { evault, lawyer } = await loadFixture(deployEVaultFixture);
+  it("Should allow a court official to upload a file", async function () {
+    await contractInstance.addCourtOfficial(courtOfficial.address);
+    const linkedClients = [client1.address, client2.address];
 
-      await evault.connect(lawyer).uploadFile(
-        "QmSomeIpfsHash",
-        "Case Title",
-        "2024-09-17",
-        "Case123",
-        "Criminal",
-        "Judge Doe"
-      );
+    const tx = await contractInstance.connect(courtOfficial).uploadFile(
+      "QmT6N8WnReB1vj1sa3GSkRPHCkWJFe6xQoiq6wFzPw5rJQ",
+      "Case Title",
+      "2023-10-01",
+      "CASE123",
+      "Criminal",
+      "Judge A",
+      linkedClients
+    );
+    await tx.wait();
 
-      const result = await evault.searchByTitle("Case Title");
-      expect(result.length).to.equal(1);
-    });
+    const file = await contractInstance.getFile(1);
+    expect(file.uploader).to.equal(courtOfficial.address);
+    expect(file.title).to.equal("Case Title");
+    expect(file.linkedClients).to.deep.equal(linkedClients);
+  });
 
-    it("Should return multiple files if more than one match the search criteria", async function () {
-      const { evault, lawyer } = await loadFixture(deployEVaultFixture);
-
-      await evault.connect(lawyer).uploadFile(
-        "QmSomeIpfsHash1",
-        "Case Title A",
-        "2024-09-17",
-        "Case123",
-        "Criminal",
-        "Judge Doe"
-      );
-
-      await evault.connect(lawyer).uploadFile(
-        "QmSomeIpfsHash2",
-        "Case Title B",
-        "2024-09-18",
-        "Case124",
+  it("Should not allow non-court officials to upload a file", async function () {
+    const linkedClients = [client1.address];
+    await expect(
+      contractInstance.uploadFile(
+        "QmT6N8WnReB1vj1sa3GSkRPHCkWJFe6xQoiq6wFzPw5rJQ",
+        "Unauthorized Upload",
+        "2023-10-01",
+        "CASE999",
         "Civil",
-        "Judge Doe"
-      );
+        "Judge B",
+        linkedClients
+      )
+    ).to.be.revertedWith("Only court officials can upload files");
+  });
 
-      const result = await evault.searchByTitle("Case Title A");
-      expect(result.length).to.equal(1);
-    });
+  it("Should allow linking a new client to an existing case file", async function () {
+    await contractInstance.addCourtOfficial(courtOfficial.address);
+    const linkedClients = [client1.address];
+    
+    await contractInstance.connect(courtOfficial).uploadFile(
+      "QmT6N8WnReB1vj1sa3GSkRPHCkWJFe6xQoiq6wFzPw5rJQ",
+      "Case Title",
+      "2023-10-01",
+      "CASE123",
+      "Criminal",
+      "Judge A",
+      linkedClients
+    );
+
+    await contractInstance.connect(courtOfficial).linkClient(1, client2.address);
+    const file = await contractInstance.getFile(1);
+    expect(file.linkedClients).to.include(client2.address);
+  });
+
+  it("Should return correct case file IDs when searching by title", async function () {
+    await contractInstance.addCourtOfficial(courtOfficial.address);
+    const linkedClients = [client1.address];
+
+    await contractInstance.connect(courtOfficial).uploadFile(
+      "QmT6N8WnReB1vj1sa3GSkRPHCkWJFe6xQoiq6wFzPw5rJQ",
+      "Case Title A",
+      "2023-10-01",
+      "CASE123",
+      "Criminal",
+      "Judge A",
+      linkedClients
+    );
+
+    await contractInstance.connect(courtOfficial).uploadFile(
+      "QmT6N8WnReB1vj1sa3GSkRPHCkWJFe6xQoiq6wFzPw5rJQ",
+      "Case Title B",
+      "2023-10-02",
+      "CASE456",
+      "Civil",
+      "Judge B",
+      linkedClients
+    );
+
+    const matchingFiles = await contractInstance.searchByTitle("Case Title A");
+    expect(matchingFiles.length).to.equal(1);
+    expect(matchingFiles[0]).to.equal(1);
   });
 });
