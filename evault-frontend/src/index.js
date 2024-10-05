@@ -1,15 +1,11 @@
-// src/index.js or src/index.tsx
-
 import React from 'react';
-import ReactDOM from 'react-dom/client'; // Import the createRoot from react-dom/client
+import ReactDOM from 'react-dom';
 import App from './App';
-import { AuthProvider } from './context/AuthContext'; // Import your AuthProvider
+import './index.css';
 
-const root = ReactDOM.createRoot(document.getElementById('root')); // Use createRoot
-root.render(
+ReactDOM.render(
     <React.StrictMode>
-        <AuthProvider>
-            <App />
-        </AuthProvider>
-    </React.StrictMode>
+        <App />
+    </React.StrictMode>,
+    document.getElementById('root')
 );
