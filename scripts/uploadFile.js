@@ -1,51 +1,46 @@
-require('dotenv').config();
-const hre = require("hardhat");
-const path = require('path');
-const fs = require('fs'); // Add this to handle file streams
-const { uploadToPinata } = require('./pinataIntegration');
+// Import necessary modules
+const express = require('express');
+const cors = require('cors'); // Import cors
+const multer = require('multer');
 
-async function main() {
-  const contractAddress = process.env.NAVINEVAULT_CONTRACT_ADDRESS;
-  const [_, lawyer] = await hre.ethers.getSigners();
+// Import the uploadFile function from scripts/uploadFile.js
+const { uploadFile } = require('./scripts/uploadFile'); // <-- Add this line
 
-  const NavinEvault = await hre.ethers.getContractAt("NavinEvault", contractAddress);
+const app = express();
+const port = 5000;
 
-  // Set the path for the file you want to upload to Pinata
-  const filePath = path.join("C:/Kapil/Blockchain-Based-eVault/hello-world.txt");
+// Use CORS middleware
+app.use(cors());
 
-  // Read the file stream
-  const fileStream = fs.createReadStream(filePath);
+// Set up multer for file handling
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-  // Upload the file to Pinata (fileStream + filename)
-  const ipfsHash = await uploadToPinata(fileStream, "hello-world.txt");
-  console.log("IPFS Hash:", ipfsHash);
+app.post('/upload', upload.single('file'), async (req, res) => {
+    try {
+        const file = req.file;
+        if (!file) return res.status(400).send("No file uploaded.");
 
-  // Prepare metadata for blockchain storage
-  const title = "Sample Case File";
-  const dateOfJudgment = "2023-09-30";
-  const caseNumber = "123ABC";
-  const category = "Civil";
-  const judgeName = "Judge Judy";
-  const linkedClients = ["0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199"];
+        const metadata = {
+            title: "Sample Case File", // Replace with dynamic values if necessary
+            dateOfJudgment: "2023-09-30",
+            caseNumber: "123ABC",
+            category: "Civil",
+            judgeName: "Judge Judy",
+            linkedClients: ["0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199"],
+        };
 
-  // Call the contract function to store the hash and metadata
-  const tx = await NavinEvault.connect(lawyer).uploadFile(
-    ipfsHash,
-    title,
-    dateOfJudgment,
-    caseNumber,
-    category,
-    judgeName,
-    linkedClients
-  );
+        // Call the uploadFile function
+        await uploadFile(file.buffer, file.originalname, metadata);
+        
+        // Respond with a success message
+        res.json({ message: "File uploaded successfully." });
+    } catch (error) {
+        console.error("Error uploading file:", error);
+        res.status(500).send("Internal server error");
+    }
+});
 
-  await tx.wait();
-  console.log(`File uploaded and stored on blockchain with IPFS hash: ${ipfsHash}`);
-}
-
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
