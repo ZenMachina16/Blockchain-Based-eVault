@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.20;
 
-contract NavinEvault {
+contract Contract {
     address public owner;
     mapping(address => bool) private courtOfficials;
     mapping(address => bool) private clients;
@@ -16,7 +16,6 @@ contract NavinEvault {
         string judgeName;
         address[] linkedClients;
         uint256 timestamp;
-        address linkedCourtOfficial;
     }
 
     mapping(uint256 => CaseFile) public caseFiles;
@@ -33,13 +32,10 @@ contract NavinEvault {
         string category,
         string judgeName,
         uint256 timestamp,
-        address[] linkedClients,
-        address linkedCourtOfficial
+        address[] linkedClients
     );
 
     event ClientLinked(uint256 indexed fileId, address client);
-    event CourtOfficialLinked(uint256 indexed fileId, address courtOfficial);
-    event CourtOfficialReplaced(uint256 indexed fileId, address newCourtOfficial);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the owner can perform this action");
@@ -51,11 +47,15 @@ contract NavinEvault {
         _;
     }
 
+    modifier onlyClient() {
+        require(clients[msg.sender], "Only registered clients can upload files");
+        _;
+    }
+
     constructor() {
         owner = msg.sender;
     }
 
-    // Register court officials and clients
     function addCourtOfficial(address _official) public onlyOwner {
         courtOfficials[_official] = true;
     }
@@ -80,7 +80,6 @@ contract NavinEvault {
         return clients[_client];
     }
 
-    // Only court officials can upload files
     function uploadFile(
         string memory _ipfsHash,
         string memory _title,
@@ -89,9 +88,10 @@ contract NavinEvault {
         string memory _category,
         string memory _judgeName,
         address[] memory _linkedClients
-    ) public onlyCourtOfficial {
+    ) public {
         require(bytes(_ipfsHash).length > 0, "IPFS hash is required");
         require(_linkedClients.length > 0, "At least one client must be linked");
+        require(courtOfficials[msg.sender] || clients[msg.sender], "Unauthorized uploader");
 
         totalCaseFiles++;
         caseFiles[totalCaseFiles] = CaseFile({
@@ -103,12 +103,11 @@ contract NavinEvault {
             category: _category,
             judgeName: _judgeName,
             linkedClients: _linkedClients,
-            timestamp: block.timestamp,
-            linkedCourtOfficial: msg.sender
+            timestamp: block.timestamp
         });
 
         for (uint256 i = 0; i < _linkedClients.length; i++) {
-            linkedClientsMap[totalCaseFiles][_linkedClients[i]] = true; // Link client
+            linkedClientsMap[totalCaseFiles][_linkedClients[i]] = true;
         }
 
         emit FileUploaded(
@@ -121,84 +120,43 @@ contract NavinEvault {
             _category,
             _judgeName,
             block.timestamp,
-            _linkedClients,
-            msg.sender // The court official (uploader) is linked
+            _linkedClients
         );
     }
 
-    // Link clients
     function linkClients(uint256 _fileId, address[] memory _clients) public onlyCourtOfficial {
         require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
-        require(caseFiles[_fileId].linkedCourtOfficial == msg.sender, "You are not the linked court official for this case");
 
         for (uint256 i = 0; i < _clients.length; i++) {
             address client = _clients[i];
-            require(!linkedClientsMap[_fileId][client], "Client is already linked to this case");
-            linkedClientsMap[_fileId][client] = true; // Link client
-            caseFiles[_fileId].linkedClients.push(client); // Add to array for external visibility
+            require(!linkedClientsMap[_fileId][client], "Client already linked");
+
+            linkedClientsMap[_fileId][client] = true;
+            caseFiles[_fileId].linkedClients.push(client);
+
             emit ClientLinked(_fileId, client);
         }
     }
 
-    // Replace court official for the case
-    function replaceCourtOfficial(uint256 _fileId, address _newCourtOfficial) public onlyCourtOfficial {
+    function getFile(uint256 _fileId) public view returns (CaseFile memory) {
         require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
-        require(courtOfficials[_newCourtOfficial], "New court official must be registered");
-        require(caseFiles[_fileId].linkedCourtOfficial == msg.sender, "You are not the current linked court official for this case");
-
-        caseFiles[_fileId].linkedCourtOfficial = _newCourtOfficial;
-        emit CourtOfficialReplaced(_fileId, _newCourtOfficial);
-    }
-
-    // Clients or court officials can get case file details
-    function getFile(uint256 _fileId) public view returns (
-        address uploader,
-        string memory ipfsHash,
-        string memory title,
-        string memory dateOfJudgment,
-        string memory caseNumber,
-        string memory category,
-        string memory judgeName,
-        address[] memory linkedClients,
-        uint256 timestamp,
-        address linkedCourtOfficial
-    ) {
-        require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
-
-        // Check if the caller is a court official or a linked client
-        require(courtOfficials[msg.sender] || linkedClientsMap[_fileId][msg.sender], "Access denied: You are not linked to this case");
-
-        CaseFile storage file = caseFiles[_fileId];
-        return (
-            file.uploader,
-            file.ipfsHash,
-            file.title,
-            file.dateOfJudgment,
-            file.caseNumber,
-            file.category,
-            file.judgeName,
-            file.linkedClients,
-            file.timestamp,
-            file.linkedCourtOfficial
+        require(
+            caseFiles[_fileId].uploader == msg.sender || linkedClientsMap[_fileId][msg.sender],
+            "Unauthorized access"
         );
+        return caseFiles[_fileId];
     }
 
-    // Search by title (clients can search for their own cases)
     function searchByTitle(string memory _title) public view returns (CaseFile[] memory) {
-        uint256 matchCount = 0;
-
-        // First, count how many case files match the title
+        uint256 count = 0;
         for (uint256 i = 1; i <= totalCaseFiles; i++) {
             if (keccak256(abi.encodePacked(caseFiles[i].title)) == keccak256(abi.encodePacked(_title))) {
-                matchCount++;
+                count++;
             }
         }
 
-        // Create an array to hold the matching case files
-        CaseFile[] memory matchingFiles = new CaseFile[](matchCount);
+        CaseFile[] memory matchingFiles = new CaseFile[](count);
         uint256 index = 0;
-
-        // Populate the matchingFiles array with the matching case files
         for (uint256 i = 1; i <= totalCaseFiles; i++) {
             if (keccak256(abi.encodePacked(caseFiles[i].title)) == keccak256(abi.encodePacked(_title))) {
                 matchingFiles[index] = caseFiles[i];
