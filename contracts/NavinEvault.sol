@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract NavinEvault {
@@ -191,28 +191,34 @@ contract NavinEvault {
     }
 
     // Search by title (clients can search for their own cases)
-    function searchByTitle(string memory _title) public view returns (CaseFile[] memory) {
-        uint256 matchCount = 0;
+function searchByTitle(string memory _title) public view returns (CaseFile[] memory) {
+    uint256 matchCount = 0;
 
-        // First, count how many case files match the title
-        for (uint256 i = 1; i <= totalCaseFiles; i++) {
-            if (keccak256(abi.encodePacked(caseFiles[i].title)) == keccak256(abi.encodePacked(_title))) {
-                matchCount++;
-            }
+    // First, count how many case files match the title and are linked to the client
+    for (uint256 i = 1; i <= totalCaseFiles; i++) {
+        if (
+            keccak256(abi.encodePacked(caseFiles[i].title)) == keccak256(abi.encodePacked(_title)) &&
+            linkedClientsMap[i][msg.sender]
+        ) {
+            matchCount++;
         }
-
-        // Create an array to hold the matching case files
-        CaseFile[] memory matchingFiles = new CaseFile[](matchCount);
-        uint256 index = 0;
-
-        // Populate the matchingFiles array with the matching case files
-        for (uint256 i = 1; i <= totalCaseFiles; i++) {
-            if (keccak256(abi.encodePacked(caseFiles[i].title)) == keccak256(abi.encodePacked(_title))) {
-                matchingFiles[index] = caseFiles[i];
-                index++;
-            }
-        }
-
-        return matchingFiles;
     }
+
+    // Create an array to hold the matching case files
+    CaseFile[] memory matchingFiles = new CaseFile[](matchCount);
+    uint256 index = 0;
+
+    // Populate the matchingFiles array with the matching case files where the client is linked
+    for (uint256 i = 1; i <= totalCaseFiles; i++) {
+        if (
+            keccak256(abi.encodePacked(caseFiles[i].title)) == keccak256(abi.encodePacked(_title)) &&
+            linkedClientsMap[i][msg.sender]
+        ) {
+            matchingFiles[index] = caseFiles[i];
+            index++;
+        }
+    }
+
+    return matchingFiles;
+}
 }
