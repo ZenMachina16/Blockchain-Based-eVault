@@ -9,7 +9,9 @@ Test the contracts : npx hardhat test
 
 Contract Local Deployment : npx hardhat node
 
-Contract Deployment on Sepolia : npx hardhat ignition deploy ignition/modules/EVaultModule.js --network sepolia
+Contract Deployment on Sepolia : npx hardhat ignition deploy ignition/modules/NavinEVaultModule.js --network sepolia
+
+Contract Deployment on localhost : npx hardhat ignition deploy ignition/modules/NavinEVaultModule.js --network localhost
 
 
 
