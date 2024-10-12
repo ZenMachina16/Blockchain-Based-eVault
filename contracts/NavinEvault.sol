@@ -148,14 +148,17 @@ contract NavinEvault {
     }
 
     // Replace court official for the case
-    function replaceCourtOfficial(uint256 _fileId, address _newCourtOfficial) public onlyCourtOfficial {
-        require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
-        require(courtOfficials[_newCourtOfficial], "New court official must be registered");
-        require(caseFiles[_fileId].linkedCourtOfficial == msg.sender, "You are not the current linked court official for this case");
+function replaceCourtOfficial(uint256 _fileId, address _newCourtOfficial) public {
+    require(
+        courtOfficials[msg.sender] || caseFiles[_fileId].linkedCourtOfficial == msg.sender,
+        "You are not authorized to replace the official"
+    );
+    require(courtOfficials[_newCourtOfficial], "New official must be registered");
 
-        caseFiles[_fileId].linkedCourtOfficial = _newCourtOfficial;
-        emit CourtOfficialReplaced(_fileId, _newCourtOfficial);
-    }
+    caseFiles[_fileId].linkedCourtOfficial = _newCourtOfficial;
+
+    emit CourtOfficialReplaced(_fileId, _newCourtOfficial);
+}
 
     // Clients or court officials can get case file details
     function getFile(uint256 _fileId) public view returns (
