@@ -51,6 +51,11 @@ contract NavinEvault {
         _;
     }
 
+    modifier onlyAuthorizedUploader() {
+        require(courtOfficials[msg.sender] || clients[msg.sender], "Only authorized users can upload files");
+        _;
+    }
+
     constructor() {
         owner = msg.sender;
     }
@@ -80,7 +85,7 @@ contract NavinEvault {
         return clients[_client];
     }
 
-    // Only court officials can upload files
+    // Allow authorized users (court officials or clients) to upload files
     function uploadFile(
         string memory _ipfsHash,
         string memory _title,
@@ -89,11 +94,13 @@ contract NavinEvault {
         string memory _category,
         string memory _judgeName,
         address[] memory _linkedClients
-    ) public onlyCourtOfficial {
+    ) public onlyAuthorizedUploader {
         require(bytes(_ipfsHash).length > 0, "IPFS hash is required");
         require(_linkedClients.length > 0, "At least one client must be linked");
 
         totalCaseFiles++;
+        address courtOfficial = courtOfficials[msg.sender] ? msg.sender : address(0);
+        
         caseFiles[totalCaseFiles] = CaseFile({
             uploader: msg.sender,
             ipfsHash: _ipfsHash,
@@ -104,7 +111,7 @@ contract NavinEvault {
             judgeName: _judgeName,
             linkedClients: _linkedClients,
             timestamp: block.timestamp,
-            linkedCourtOfficial: msg.sender
+            linkedCourtOfficial: courtOfficial
         });
 
         for (uint256 i = 0; i < _linkedClients.length; i++) {
@@ -122,7 +129,7 @@ contract NavinEvault {
             _judgeName,
             block.timestamp,
             _linkedClients,
-            msg.sender // The court official (uploader) is linked
+            courtOfficial
         );
     }
 
