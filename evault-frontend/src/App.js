@@ -1,21 +1,22 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LandingPage from './components/LandingPage';
-import LawyerRegister from './components/LawyerRegister';
-import LawyerDashboard from './components/LawyerDashboard';
-import ClientDashboard from './components/ClientDashboard';
+import React from "react";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom"; // Importing Router and Route
+import UploadDocCourtOfficial from "./components/UploadDocCourtOfficial"; // Import the new UploadDocCourtOfficial component
 
-const App = () => {
-    return (
-        <Router>
-            <Routes>
-                <Route path='/' element={<LandingPage />} />
-                <Route path='/register' element={<LawyerRegister />} />
-                <Route path='/lawyer-dashboard' element={<LawyerDashboard />} />
-                <Route path='/client-dashboard' element={<ClientDashboard />} />
-            </Routes>
-        </Router>
-    );
-};
+function App() {
+  return (
+    <Router>
+      <div>
+        <nav>
+          <Link to="/">Home</Link>
+          <Link to="/upload">Upload Document</Link>
+        </nav>
+        <Routes>
+          <Route path="/upload" element={<UploadDocCourtOfficial />} /> {/* Route for UploadDocCourtOfficial */}
+          <Route path="/" element={<h1>Welcome to the NavinEvault</h1>} /> {/* Home page */}
+        </Routes>
+      </div>
+    </Router>
+  );
+}
 
 export default App;
