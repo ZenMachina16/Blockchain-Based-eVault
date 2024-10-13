@@ -1,43 +1,32 @@
-const express = require('express');
-const cors = require('cors'); // Import cors
-const multer = require('multer');
+  // backend/server.js
 
+  const express = require('express');
+  const multer = require('multer'); // Middleware for handling multipart/form-data
+  const fs = require('fs'); // Import file system module
+  const { uploadToPinata } = require('../scripts/pinataIntegration'); // Your existing upload function
+  const bodyParser = require('body-parser');
+  const cors = require('cors');
 
-const app = express();
-const port = 5000;
+  const app = express();
+  const port = process.env.PORT || 5000;
 
-// Use CORS middleware
-app.use(cors());
+  app.use(cors()); // Enable CORS for all routes
 
-// Set up multer for file handling
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+  const upload = multer({ dest: 'uploads/' }); // Set destination for temporary file storage
 
-app.post('/upload', upload.single('file'), async (req, res) => {
+  app.use(bodyParser.json());
+
+  // Upload file to Pinata
+  app.post('/upload', upload.single('file'), async (req, res) => {
     try {
-        const file = req.file;
-        if (!file) return res.status(400).send("No file uploaded.");
-
-        const metadata = {
-            title: "Sample Case File", // Replace with dynamic values if necessary
-            dateOfJudgment: "2023-09-30",
-            caseNumber: "123ABC",
-            category: "Civil",
-            judgeName: "Judge Judy",
-            linkedClients: ["0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199"],
-        };
-
-        // Call the uploadFile function
-        await uploadFile(file.buffer, file.originalname, metadata);
-        
-        // Respond with a success message
-        res.json({ message: "File uploaded successfully." });
+      const fileStream = fs.createReadStream(req.file.path); // Read the uploaded file
+      const ipfsHash = await uploadToPinata(fileStream, req.file.originalname);
+      res.json({ success: true, ipfsHash });
     } catch (error) {
-        console.error("Error uploading file:", error);
-        res.status(500).send("Internal server error");
+      res.status(500).json({ success: false, message: error.message });
     }
-});
+  });
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });

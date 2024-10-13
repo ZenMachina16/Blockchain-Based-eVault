@@ -39,3 +39,5 @@ Private Key: 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
 
 
 latest contract updated navinEvault in new branch
+
+Sepolia Deployed Latest Contract on 12 Oct Contract Address 0x7fE96194Da4Bfe9AB215a998ec0be4d8c44c948F
