@@ -11,7 +11,8 @@
   "description": "",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "hardhat": "^2.22.11"
+    "hardhat": "^2.22.12",
+    "hardhat-gas-reporter": "^2.2.1"
   },
   "dependencies": {
     "@nomicfoundation/hardhat-ignition": "^0.15.5",

@@ -1,78 +1,32 @@
-const express = require('express');
-const cors = require('cors');
-const formidable = require('formidable');
-const fs = require('fs');
-const path = require('path');
-const { exec } = require('child_process');
-require('dotenv').config();
+  // backend/server.js
 
-const { uploadToPinata } = require('../scripts/pinataIntegration'); // Import the function
+  const express = require('express');
+  const multer = require('multer'); // Middleware for handling multipart/form-data
+  const fs = require('fs'); // Import file system module
+  const { uploadToPinata } = require('../scripts/pinataIntegration'); // Your existing upload function
+  const bodyParser = require('body-parser');
+  const cors = require('cors');
 
-const app = express(); // Initialize the app
-const PORT = 5000;
+  const app = express();
+  const port = process.env.PORT || 5000;
 
-// Use CORS middleware
-app.use(cors());
+  app.use(cors()); // Enable CORS for all routes
 
-// Endpoint to handle file upload
-app.post('/upload', (req, res) => {
-  const form = new formidable.IncomingForm();
+  const upload = multer({ dest: 'uploads/' }); // Set destination for temporary file storage
 
-  form.uploadDir = path.join(__dirname, 'temp'); // Temporary directory for uploads
-  form.keepExtensions = true;
+  app.use(bodyParser.json());
 
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      console.error('Error processing file:', err);
-      return res.status(500).json({ error: 'Error processing file' });
-    }
-
-    const file = files.file[0];
-    const filePath = file.filepath;
-    console.log('File received:', filePath);
-
+  // Upload file to Pinata
+  app.post('/upload', upload.single('file'), async (req, res) => {
     try {
-      // Create a read stream from the file
-      const fileStream = fs.createReadStream(filePath);
-
-      // Upload the file to Pinata using the Pinata SDK function
-      const ipfsHash = await uploadToPinata(fileStream, file.originalFilename);
-
-      // Clean up temporary file
-      fs.unlinkSync(filePath);
-
-      res.json({ ipfsHash });
+      const fileStream = fs.createReadStream(req.file.path); // Read the uploaded file
+      const ipfsHash = await uploadToPinata(fileStream, req.file.originalname);
+      res.json({ success: true, ipfsHash });
     } catch (error) {
-      console.error('Error uploading file to Pinata:', error);
-      res.status(500).json({ error: 'Failed to upload file to Pinata' });
+      res.status(500).json({ success: false, message: error.message });
     }
   });
-});
 
-// Endpoint to fetch document hash from the smart contract
-const scriptPath = path.resolve(__dirname, '../scripts/getHashFromContract.js');
-app.get('/document-hash', (req, res) => {
-  exec(`npx hardhat run ${scriptPath} --network sepolia`, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error executing script: ${error}`);
-      return res.status(500).json({ error: 'Failed to fetch document hash' });
-    }
-
-    if (stderr) {
-      console.error(`stderr: ${stderr}`);
-      return res.status(500).json({ error: 'Error in script execution' });
-    }
-
-    try {
-      const result = JSON.parse(stdout);
-      res.json(result);
-    } catch (parseError) {
-      console.error(`Error parsing script output: ${parseError}`);
-      res.status(500).json({ error: 'Failed to parse document hash' });
-    }
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
   });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});

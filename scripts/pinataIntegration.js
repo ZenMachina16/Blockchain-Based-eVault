@@ -41,4 +41,3 @@ module.exports = {
   uploadToPinata,
   fetchFromPinata
 };
-
