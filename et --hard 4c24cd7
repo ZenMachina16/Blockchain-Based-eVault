@@ -1,0 +1,44 @@
+[33md07f7fa[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mNavinEvault[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33m18595cf[m HEAD@{1}: reset: moving to HEAD~1
+[33m6a56358[m HEAD@{2}: reset: moving to HEAD~1
+[33mea16b4e[m HEAD@{3}: reset: moving to HEAD~1
+[33mfb698b4[m[33m ([m[1;31morigin/new[m[33m)[m HEAD@{4}: reset: moving to HEAD~1
+[33m4c24cd7[m[33m ([m[1;32mnew[m[33m)[m HEAD@{5}: reset: moving to HEAD~1
+[33m976bdde[m HEAD@{6}: reset: moving to HEAD~1
+[33m8228067[m HEAD@{7}: reset: moving to HEAD~1
+[33m889e54f[m HEAD@{8}: commit: Small changes
+[33m8228067[m HEAD@{9}: commit: Small changes
+[33m976bdde[m HEAD@{10}: commit: Small changes
+[33m4c24cd7[m[33m ([m[1;32mnew[m[33m)[m HEAD@{11}: checkout: moving from new to NavinEvault
+[33m4c24cd7[m[33m ([m[1;32mnew[m[33m)[m HEAD@{12}: commit: Backend Contract Working
+[33mfb698b4[m[33m ([m[1;31morigin/new[m[33m)[m HEAD@{13}: commit: Backend interaction
+[33mea16b4e[m HEAD@{14}: commit: Smalk change
+[33m6a56358[m HEAD@{15}: commit: Contract deployed to sepolia
+[33m18595cf[m HEAD@{16}: commit: New Updates
+[33md07f7fa[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mNavinEvault[m[33m)[m HEAD@{17}: commit: New Contract with potential issues solved
+[33m971a0de[m HEAD@{18}: commit: Client can upload
+[33m6fe5f88[m HEAD@{19}: commit: Updated Contract
+[33m880f561[m HEAD@{20}: checkout: moving from Kapil to new
+[33m50baa9c[m[33m ([m[1;31morigin/Kapil[m[33m, [m[1;32mKapil[m[33m)[m HEAD@{21}: checkout: moving from newcontract to Kapil
+[33md5bb738[m[33m ([m[1;32mnewcontract[m[33m)[m HEAD@{22}: commit: New
+[33mc2f2864[m[33m ([m[1;31morigin/newcontract[m[33m)[m HEAD@{23}: checkout: moving from Kapil to newcontract
+[33m50baa9c[m[33m ([m[1;31morigin/Kapil[m[33m, [m[1;32mKapil[m[33m)[m HEAD@{24}: checkout: moving from main to Kapil
+[33me24a85c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{25}: checkout: moving from newcontract to main
+[33mc2f2864[m[33m ([m[1;31morigin/newcontract[m[33m)[m HEAD@{26}: checkout: moving from new to newcontract
+[33m880f561[m HEAD@{27}: commit: New
+[33mf6de946[m HEAD@{28}: commit: New
+[33m2b8d3e9[m HEAD@{29}: commit: New Edit
+[33mc2f2864[m[33m ([m[1;31morigin/newcontract[m[33m)[m HEAD@{30}: checkout: moving from newcontract to new
+[33mc2f2864[m[33m ([m[1;31morigin/newcontract[m[33m)[m HEAD@{31}: commit: New contract not finished
+[33m25642d6[m[33m ([m[1;31morigin/Contracts[m[33m, [m[1;32mContracts[m[33m)[m HEAD@{32}: checkout: moving from Contracts to newcontract
+[33m25642d6[m[33m ([m[1;31morigin/Contracts[m[33m, [m[1;32mContracts[m[33m)[m HEAD@{33}: commit: New Contract Created with New Features Updates
+[33mcad4bff[m HEAD@{34}: commit: New Contract with sepolia deployed
+[33m50baa9c[m[33m ([m[1;31morigin/Kapil[m[33m, [m[1;32mKapil[m[33m)[m HEAD@{35}: checkout: moving from Kapil to Contracts
+[33m50baa9c[m[33m ([m[1;31morigin/Kapil[m[33m, [m[1;32mKapil[m[33m)[m HEAD@{36}: commit: Complete Frontend & Backend Integration
+[33m77232aa[m HEAD@{37}: commit: Hash manual storage into Contract
+[33m5a90b53[m HEAD@{38}: commit: Pinata Integration
+[33m2e372e6[m HEAD@{39}: commit: New Sepolia Deployment
+[33m57b6f0f[m HEAD@{40}: commit: Document Storage Contracts and Tests
+[33mb0e79ee[m HEAD@{41}: commit: New ignition changes
+[33me24a85c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{42}: checkout: moving from main to Kapil
+[33me24a85c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{43}: clone: from https://github.com/KapilDhavale/Blockchain-Based-eVault.git
