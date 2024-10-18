@@ -1,26 +1,24 @@
-// scripts/pinataIntegration.js
-
-const { ethers } = require("hardhat");
-require("dotenv").config();
-const fs = require("fs");
-const FormData = require("form-data");
-const axios = require("axios");
+const { ethers } = require("hardhat"); // Import ethers from Hardhat for interacting with the blockchain
+require("dotenv").config(); // Load environment variables from .env file
+const FormData = require("form-data"); // Import FormData to handle file uploads
+const axios = require("axios"); // Import axios for making HTTP requests
 
 // Function to upload a file to Pinata
 async function uploadToPinata(fileStream, fileName) {
     try {
         const pinataJwt = process.env.PINATA_JWT; // Your Pinata JWT
-        const form = new FormData();
-        form.append("file", fileStream, fileName); // Add file to the form
+        const form = new FormData(); // Create a new FormData object
+        form.append("file", fileStream, fileName); // Add the file to the form
 
+        // Send a POST request to Pinata to upload the file
         const response = await axios.post(`https://api.pinata.cloud/pinning/pinFileToIPFS`, form, {
             headers: {
-                ...form.getHeaders(),
-                Authorization: `Bearer ${pinataJwt}`
+                ...form.getHeaders(), // Get headers from FormData
+                Authorization: `Bearer ${pinataJwt}` // Include the JWT for authentication
             }
         });
 
-        const ipfsHash = response.data.IpfsHash; // Get the IPFS hash from the response
+        const ipfsHash = response.data.IpfsHash; // Extract the IPFS hash from the response
         console.log("Uploaded File:", response.data);
         return ipfsHash; // Return the IPFS hash for further processing
     } catch (error) {
