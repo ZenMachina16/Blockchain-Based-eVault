@@ -3,42 +3,46 @@ require("dotenv").config();
 
 async function main() {
     const [deployer] = await ethers.getSigners();
+    console.log("Fetching case file with the account:", deployer.address);
 
-    // Load your contract
-    const EVault = await ethers.getContractFactory("NavinEvault"); // Make sure this matches your contract name
-    const eVault = await EVault.attach(process.env.NAVINEVAULT_CONTRACT_ADDRESS); // Ensure NEWEVAULT_CONTRACT_ADDRESS is in .env
+    const NavinEvault = await ethers.getContractFactory("NavinEvault");
+    const contract = await NavinEvault.attach(process.env.NAVINEVAULT_CONTRACT_ADDRESS);
 
-    // Get the fileId from command line arguments
-    const fileId = process.argv[2]; // Fetch the fileId from command line arguments
-
-    if (!fileId) {
-        console.error(JSON.stringify({ error: "Please provide a file ID." }));
-        process.exit(1);
-    }
-
-    // Fetch the document with the specified fileId
     try {
-        const caseFile = await eVault.getFile(fileId); // Call the getFile function
+        const totalFiles = await contract.totalCaseFiles();
+        console.log(`Total case files: ${totalFiles.toString()}`);
+        console.log(`Type of totalFiles: ${typeof totalFiles}`);
 
-        // Output JSON with document details
-        console.log(JSON.stringify({
-            uploader: caseFile[0],
-            ipfsHash: caseFile[1],
-            title: caseFile[2],
-            dateOfJudgment: caseFile[3],
-            caseNumber: caseFile[4],
-            category: caseFile[5],
-            judgeName: caseFile[6],
-            timestamp: caseFile[7]
-        }));
+        if (totalFiles === 0n) {
+            console.log("No case files exist. Please upload a case file before fetching.");
+            return;
+        }
+
+        for (let i = 1; i <= totalFiles; i++) {
+            const caseFile = await contract.getFile(i);
+            const caseFileData = {
+                caseNumber: caseFile.caseNumber.toString(), // Assuming caseNumber is a BigInt
+                title: caseFile.title || "N/A",
+                ipfsHash: caseFile.ipfsHash || null,
+                dateOfJudgment: caseFile.dateOfJudgment || "N/A",
+                category: caseFile.category || "N/A",
+                judgeName: caseFile.judgeName || "N/A",
+                linkedClients: caseFile.linkedClients || [],
+                metadata: {
+                    uploader: caseFile.uploader || "N/A",
+                    timestamp: caseFile.timestamp.toString() || "N/A"
+                }
+            };
+
+            console.log(JSON.stringify(caseFileData, null, 2)); // Pretty-print JSON
+        }
     } catch (error) {
-        console.error(JSON.stringify({ error: error.message }));
-        process.exit(1);
+        console.error(JSON.stringify({ error: error.message || error }));
+        process.exitCode = 1;
     }
 }
 
-// Execute the main function
 main().catch((error) => {
-    console.error(JSON.stringify({ error: error.message }));
+    console.error(JSON.stringify({ error: error.message || error }));
     process.exitCode = 1;
 });
