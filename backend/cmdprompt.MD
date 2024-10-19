@@ -4,3 +4,18 @@ C:\Users\Kapil>curl -X POST -F "file=@C:\Kapil\Blockchain-Based-eVault\hello-wor
 C:\Users\Kapil>curl -X GET http://localhost:5000/metadata/6dc241150954052573e22d5a998162f5
 {"message":"Metadata retrieved successfully","metadata":{"title":"Backend Works great","dateOfJudgment":"2024-10-18","caseNumber":"12346","category":"Blockchain","judgeName":"Rajat Dalal","linkedClients":["0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC","0x90F79bf6EB2c4f870365E785982E1f101E93b906"],"uploader":"hello-world.txt","timestamp":"2024-10-18T15:33:34.070Z","ipfsHash":"QmZUui2Tm9KVgXdFB47ko1tKt6Z1fSMbatN3wkhzdYnMJM"}}
 C:\Users\Kapil>
+
+
+
+
+
+
+........................
+
+
+
+C:\Users\Kapil>curl -X POST http://localhost:5000/upload -F "file=@C:\\Kapil\\Blockchain-Based-eVault\\hello-world.txt" -F "title=Successful Upload" -F "dateOfJudgment=2024-10-19" -F "caseNumber=12345" -F "category=Civil" -F "judgeName=Judge Doe" -F "linkedClients=[\"0x90F79bf6EB2c4f870365E785982E1f101E93b906\",\"0x90F79bf6EB2c4f870365E785982E1f101E93b906\"]"
+{"message":"File uploaded successfully","file":{"fieldname":"file","originalname":"hello-world.txt","encoding":"7bit","mimetype":"text/plain","destination":"uploads/","filename":"82bbeddb9d6cff9e493da874215ca2ec","path":"uploads\\82bbeddb9d6cff9e493da874215ca2ec","size":12},"ipfsHash":"QmZUui2Tm9KVgXdFB47ko1tKt6Z1fSMbatN3wkhzdYnMJM","metadata":{"title":"Successful Upload","dateOfJudgment":"2024-10-19","caseNumber":"12345","category":"Civil","judgeName":"Judge Doe","linkedClients":["0x90F79bf6EB2c4f870365E785982E1f101E93b906","0x90F79bf6EB2c4f870365E785982E1f101E93b906"],"uploader":"hello-world.txt","timestamp":"2024-10-19T06:33:53.597Z","ipfsHash":"QmZUui2Tm9KVgXdFB47ko1tKt6Z1fSMbatN3wkhzdYnMJM"}}
+C:\Users\Kapil>curl -X GET http://localhost:5000/metadata/76c08bedbb116be9a8f56f926407875f
+{"message":"Metadata retrieved successfully","metadata":{"title":"Successful Upload","dateOfJudgment":"2024-10-19","caseNumber":"12345","category":"Civil","judgeName":"Judge Doe","linkedClients":["0x90F79bf6EB2c4f870365E785982E1f101E93b906","0x90F79bf6EB2c4f870365E785982E1f101E93b906"],"uploader":"hello-world.txt","timestamp":"2024-10-19T06:32:59.802Z","ipfsHash":"QmZUui2Tm9KVgXdFB47ko1tKt6Z1fSMbatN3wkhzdYnMJM"}}
+C:\Users\Kapil>
