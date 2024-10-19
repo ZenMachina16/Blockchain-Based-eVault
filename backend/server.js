@@ -1,15 +1,17 @@
-// server.js
-
 const express = require('express'); // Import express for building the server
 const multer = require('multer'); // Import multer for handling file uploads
 const path = require('path'); // Import path for handling file paths
 const fs = require('fs'); // Import fs for file system operations
+const cors = require('cors'); // Import cors for enabling CORS
 const { uploadToPinata, storeHashInContract } = require('../scripts/pinataIntegration'); // Import functions for Pinata interaction
 const { ethers } = require("hardhat"); // Import ethers for contract interaction
 require("dotenv").config(); // Load environment variables
 
 const app = express();
 const upload = multer({ dest: 'uploads/' }); // Specify the directory for storing uploaded files
+
+// Enable CORS for all routes
+app.use(cors());
 
 // In-memory storage for metadata (you can switch to a database for persistent storage)
 let fileMetadata = {}; // Initialize an object to store file metadata
