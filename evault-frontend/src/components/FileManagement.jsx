@@ -75,16 +75,16 @@
                                     required 
                                 />
                             </div>
-                            <div className="input1"> 
+                            {/* <div className="input1"> 
                                 <label htmlFor="caseDescription">Case Description:</label>
                                 <input 
                                     type="text" 
-                                    id="caseDescription" 
-                                    value={dateOfJudgment}
-                                    onChange={(e) => setDateOfJudgment(e.target.value)} 
+                                    id="case description" 
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)} 
                                     required 
                                 />
-                            </div>
+                            </div> */}
                             <div className="input1"> 
                                 <label htmlFor="judgeName">Judge Name:</label>
                                 <input 
