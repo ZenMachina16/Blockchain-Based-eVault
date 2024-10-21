@@ -7,6 +7,12 @@ const LawyeDashboard = () => {
 
     const handleButtonClick = () => {
         navigate('/file-management'); // Navigate to the File Management page
+
+       
+    };
+
+    const handleFindCaseClick = () => {
+        navigate('/fetch-file');
     };
 
     return (
@@ -36,7 +42,7 @@ const LawyeDashboard = () => {
                     <button onClick={handleButtonClick} className="registercase"> {/* Button for navigation */}
                     Register a New Case
                 </button>
-                <button onClick={handleButtonClick} className="fetchcase"> {/* Button for navigation */}
+                <button onClick={handleFindCaseClick} className="fetchcase"> {/* Button for navigation */}
                     Find a Case
                 </button>
                     </div>
