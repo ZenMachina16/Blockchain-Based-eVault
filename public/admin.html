@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Court Official</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-top: 10px;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add Court Official</h1>
+    <button id="runCommandBtn">Run Hardhat Command</button>
+    <div id="result"></div>
+    
+    <div id="addressInput" style="display:none;">
+        <input type="text" id="address" placeholder="Enter Court Official Address" />
+        <button id="addOfficialBtn">Add Court Official</button>
+    </div>
+
+    <script>
+        document.getElementById('runCommandBtn').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                const response = await fetch('/runCommand', { method: 'POST' });
+
+                if (!response.ok) {
+                    throw new Error('Failed to run Hardhat command');
+                }
+
+                const data = await response.json();
+                resultDiv.textContent = `Command executed: ${data.message}`;
+                document.getElementById('addressInput').style.display = 'block'; // Show address input after command execution
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        });
+
+        document.getElementById('addOfficialBtn').addEventListener('click', async () => {
+            const resultDiv = document.getElementById('result');
+            const address = document.getElementById('address').value;
+
+            try {
+                const response = await fetch('/addCourtOfficial', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ address }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add court official');
+                }
+
+                const data = await response.json();
+                resultDiv.textContent = `Success: ${data.message}`;
+            } catch (error) {
+                resultDiv.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
