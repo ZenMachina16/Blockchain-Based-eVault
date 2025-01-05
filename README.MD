@@ -41,3 +41,24 @@ Account #2: 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC (10000 ETH)
 latest contract updated navinEvault in new branch
 
 Sepolia Deployed Latest Contract on 12 Oct Contract Address 0x7fE96194Da4Bfe9AB215a998ec0be4d8c44c948F
+
+
+
+
+
+
+step 1
+local host start - : npx hardhat node
+
+step 2
+run all the command in root
+npx hardhat run scripts/addCourtOfficial.js --network localhost
+(add addresses from local according)
+npx hardhat run scripts/addClient.js --network localhost
+
+
+
+step 3
+
+
+

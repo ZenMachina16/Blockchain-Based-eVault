@@ -17,7 +17,7 @@ const Homepage = () => {
                 className="image" 
             />
             <div className="darkcover"> {/* Dark overlay */}
-                <div className="title">BLOCKCHAIN BASED EVAULT</div>
+                <div className="title">BLOCKCHAIN BASED e-VAULT</div>
                 <button onClick={handleButtonClick} className="button"> {/* Button for navigation */}
                     GET STARTED
                 </button>
