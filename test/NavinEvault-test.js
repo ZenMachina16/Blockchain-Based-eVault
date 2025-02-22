@@ -34,7 +34,7 @@ describe("NavinEvault Contract", function () {
       "12345", // Case Number
       "Criminal", // Category
       "Judge Name", // Judge Name
-      linkedClients
+      linkedClients,
     );
 
     const caseDetails = await navinEvault.connect(client1).getFile(1); // Linked client should be able to access
@@ -56,7 +56,7 @@ describe("NavinEvault Contract", function () {
       "98765", // Case Number
       "Civil", // Category
       "Judge Client", // Judge Name
-      linkedClients
+      linkedClients,
     );
 
     const caseDetails = await navinEvault.connect(client1).getFile(1); // Adjust this if your file ID is different
@@ -78,8 +78,8 @@ describe("NavinEvault Contract", function () {
           "54321",
           "Invalid",
           "Invalid Judge",
-          linkedClients
-        )
+          linkedClients,
+        ),
     ).to.be.revertedWith("Only authorized users can upload files"); // Updated to match actual error
   });
 
@@ -96,7 +96,7 @@ describe("NavinEvault Contract", function () {
         "12345",
         "Criminal",
         "Judge Name",
-        initialClients
+        initialClients,
       );
 
     // Link additional client
@@ -122,12 +122,12 @@ describe("NavinEvault Contract", function () {
         "12345",
         "Criminal",
         "Judge Name",
-        linkedClients
+        linkedClients,
       );
 
     // Attempt to link the same client again
     await expect(
-      navinEvault.connect(courtOfficial1).linkClients(1, [client1.address])
+      navinEvault.connect(courtOfficial1).linkClients(1, [client1.address]),
     ).to.be.revertedWith("Client is already linked to this case");
   });
 
@@ -141,7 +141,7 @@ describe("NavinEvault Contract", function () {
       "12345", // Case Number
       "Criminal", // Category
       "Judge Name", // Judge Name
-      linkedClients
+      linkedClients,
     );
 
     // Replace court official
@@ -166,12 +166,12 @@ describe("NavinEvault Contract", function () {
         "12345",
         "Criminal",
         "Judge Name",
-        linkedClients
+        linkedClients,
       );
 
     // Non-linked user (nonCourtOfficial) tries to access the file
     await expect(
-      navinEvault.connect(nonCourtOfficial).getFile(1)
+      navinEvault.connect(nonCourtOfficial).getFile(1),
     ).to.be.revertedWith("Access denied: You are not linked to this case");
   });
 
@@ -188,7 +188,7 @@ describe("NavinEvault Contract", function () {
         "12345",
         "Criminal",
         "Judge Name",
-        linkedClients
+        linkedClients,
       );
 
     // Client1 searches for "Case A"

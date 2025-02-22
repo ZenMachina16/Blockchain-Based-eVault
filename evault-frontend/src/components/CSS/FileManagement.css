@@ -1,137 +1,136 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Intro Rust';
-
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Intro Rust";
 }
 
-html, body {
-    height: 100%;
-    width: 100%;
+html,
+body {
+  height: 100%;
+  width: 100%;
 }
 
 .file-management {
-    background-image: url('../../../public/case-register-bg.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    height: 100vh;
-    width: 100vw;
-    color: rgb(0, 0, 0);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  background-image: url("../../../public/case-register-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  height: 100vh;
+  width: 100vw;
+  color: rgb(0, 0, 0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .darkcover {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.943); /* Reduced opacity */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-    padding: 20px;
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.943); /* Reduced opacity */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  padding: 20px;
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); */
 }
 
 .head {
-    font-size: 3vw;
-    color: #ffff;
-    font-family: 'Intro Rust';
-    font-weight: 1000;
+  font-size: 3vw;
+  color: #ffff;
+  font-family: "Intro Rust";
+  font-weight: 1000;
 }
 
 input {
-    width: 77%;
-    padding: 10px;
-    margin-left: 10px; /* Adjust margin for spacing */
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  width: 77%;
+  padding: 10px;
+  margin-left: 10px; /* Adjust margin for spacing */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  background-color: #4caf50;
+  color: white;
+  cursor: pointer;
 }
 
 button:hover {
-    background-color: #45a049;
+  background-color: #45a049;
 }
 
 p {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .button-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  width: 100%;
 }
 
 .next-button {
-    margin-left: auto;
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+  margin-left: auto;
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .next-button:hover {
-    background-color: #45a049;
+  background-color: #45a049;
 }
 
 .mukhya {
-    width: 80%;
-    height: 30px;
-    justify-content: center;
-    align-items: center;
-    /* background-color: #ccc; */
-    font-size: 2vw;
-    color: #ffff;
+  width: 80%;
+  height: 30px;
+  justify-content: center;
+  align-items: center;
+  /* background-color: #ccc; */
+  font-size: 2vw;
+  color: #ffff;
 }
 
 #form1 {
-    width: 80vw;
-    height: 29vw; 
-    background-color: rgba(221, 219, 219, 0.67);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-wrap: wrap; /* Allows wrapping of child elements */
-    justify-content: space-between; /* Space between columns */
+  width: 80vw;
+  height: 29vw;
+  background-color: rgba(221, 219, 219, 0.67);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping of child elements */
+  justify-content: space-between; /* Space between columns */
 }
 
 .input1 {
-    display: flex; 
-    align-items: center; 
-    margin: 10px 0; 
-    width: 48%; /* Adjust width for two columns */
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  width: 48%; /* Adjust width for two columns */
 }
 
 .input1 label {
-    margin-right: 10px; 
-    flex: 0 0 30%; 
-    text-align: right; 
+  margin-right: 10px;
+  flex: 0 0 30%;
+  text-align: right;
 }
 
 .input1 input {
-    flex: 1; 
+  flex: 1;
 }
-

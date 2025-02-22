@@ -1,65 +1,308 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+}
+
 .container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  /* overflow: hidden; */
 }
 
 .image {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image covers the entire screen */
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Ensures the image covers the entire screen */
 }
 
 .darkcover {
-    position: absolute; /* Ensure it covers the entire container */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(16, 16, 16, 0.57); /* Dark overlay */
-    display: flex;
-    flex-direction: column; /* Stack title and button vertically */
-    justify-content: center; /* Center vertically */
-    align-items: center; /* Center horizontally */
+  position: absolute;
+  /* Ensure it covers the entire container */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(234, 132, 132, 0.1);
+  /* Reduced dark overlay */
+  display: flex;
+  flex-direction: column;
+  /* Stack title and button vertically */
+  justify-content: center;
+  /* Center vertically */
+  align-items: center;
+  /* Center horizontally */
 }
 
-.title{
-    width:auto;
-    position: absolute;
-    color: #ffffff;
-    top: 30%;
-    font-size: 6vw;
-    /* background-color: aqua; */
-    display: flex;
-    justify-content: center;
-    font-family: 'Intro Rust';
-    font-weight: 1000;
-
+.title {
+  width: auto;
+  position: absolute;
+  color: #ffffff;
+  top: 30%;
+  font-size: 6vw;
+  /* background-color: aqua; */
+  display: flex;
+  justify-content: center;
+  font-family: "Intro Rust";
+  font-weight: 1000;
 }
 
-
-.button {
-    padding: 10px 10px;
-    width: 15vw;
-    font-size: 1.5em;
-    font-family: 'Intro Rust';
-    font-weight: 600;
-    background-color: #ffffff; /* Button background color */
-    color: #000000; /* Button text color */
-    border: none; /* No border */
-    border-radius: 10px; /* Rounded corners */
-    cursor: pointer; /* Pointer cursor on hover */
-    position: absolute; /* Make the button's position relative to the container */
-    top: 60%; /* Adjust position for the button */
-    left: 80%;
-    transform: translate(-20%,-5%); /* Center the button */
-    transition: background-color 0.6s ease, transform 0.10s ease;
-    
+#startButton {
+  padding: 10px 10px;
+  width: 18vw;
+  font-size: 1.4em;
+  font-family: "Intro Rust";
+  font-weight: 600;
+  letter-spacing: 1px;
+  background-color: #ffffff;
+  /* Button background color */
+  color: #000000;
+  /* Button text color */
+  border: none;
+  /* No border */
+  border-radius: 10px;
+  /* Rounded corners */
+  cursor: pointer;
+  /* Pointer cursor on hover */
+  position: absolute;
+  top: 60%;
+  left: 80%;
+  transform: translate(-20%, -5%);
+  /* Center the button */
+  transition: color 0.3s ease;
+  overflow: hidden;
+  /* Prevent overflow from animation */
 }
 
-.button:hover{
-    background-color: #000000;
-    color: #ffffff; 
+/* The black ball effect */
+#startButton::before {
+  content: "";
+  position: absolute;
+  width: 150%;
+  height: 300%;
+  background-color: #000;
+  border-radius: 50%;
+  bottom: -350%;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: bottom 0.8s ease-in-out;
+  z-index: 0;
+  /* Ensure the ball stays behind */
+}
+
+/* When hovered, bring the black ball up */
+#startButton:hover::before {
+  bottom: -50%;
+}
+
+#startButton:hover {
+  color: #ffffff;
+  border: none;
+  /* Change text color when hovered */
+}
+
+/* Ensure text stays above the effect */
+#startButton span {
+  position: relative;
+  z-index: 6;
+  /* Higher z-index than the black ball */
+}
+
+#about {
+  background: linear-gradient(180deg, #d0c7b4, #c2ae85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 60vh;
+  /* padding: ; */
+}
+
+#about-head {
+  /* background-color: aquamarine; */
+  padding: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 2em;
+}
+
+#about-para {
+  /* background-color: aqua; */
+  width: 90vw;
+  padding: 20px 0;
+  font-size: 2em;
+  text-align: justify;
+}
+
+#features {
+  width: 100vw;
+  height: fit-content;
+  background: linear-gradient(180deg, #90cad4, #1d99af);
+  padding: 30px 0px;
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* 2 columns */
+  gap: 60px 100px;
+  /* Spacing between boxes */
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  max-width: 800px;
+  /* Adjust as needed */
+  margin: auto;
+  padding: 20px;
+}
+
+.feature-box {
+  background-color: white;
+  padding: 20px;
+  height: 200px;
+  width: 270px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#feature-head {
+  /* background-color: aquamarine; */
+  display: flex;
+  justify-content: center;
+  font-size: 2.5em;
+  font-weight: 700;
+}
+
+#feature-head img {
+  width: 300px;
+  height: 300px;
+}
+
+.support-center {
+  /* padding: 50px 20px; */
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(225deg, #2c3e50 0%, #27425d 19%, #648db6 100%);
+  color: white;
+}
+
+#support-head {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 2em;
+  font-weight: 700;
+  padding: 30px 0px;
+}
+
+#support-para {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 1.2em;
+  /* padding: 40px 0px; */
+}
+
+.support-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px 100px;
+  max-width: 90vw;
+  margin: 0px auto;
+  /* background-color: aqua; */
+}
+
+.support-box {
+  /* background: rgba(255, 255, 255, 0.1); */
+  padding: 50px 40px;
+  /* border-radius: 10px; */
+  text-align: center;
+  border-bottom: 1px solid white;
+  /* box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2); */
+  /* width: 400px; */
+}
+
+.support-box p i {
+  font-size: 1.4em;
+}
+
+.support-box img {
+  width: 90px;
+}
+
+.support-icon {
+  width: 50px;
+  margin-bottom: 10px;
+}
+
+.footer {
+  display: flex;
+  background: black;
+  padding: 15px;
+  margin-top: 40px;
+  justify-content: space-evenly;
+  align-items: center;
+  font-size: 1.4em;
+  height: 90px;
+}
+
+.footer a {
+  color: white;
+  text-decoration: none;
+  margin: 0 15px;
+}
+
+/* Webkit Browsers (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 10px;
+  /* Slim scrollbar */
+  height: 10px;
+  /* For horizontal scrollbars */
+}
+
+/* Fully Hide the Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+  /* Completely transparent */
+}
+
+/* Scrollbar Handle (Draggable part) */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #4d5055, #1f282d);
+  /* Smooth blue gradient */
+  border-radius: 50px;
+  /* Fully curved scrollbar */
+  box-shadow: 0px 0px 8px rgba(58, 134, 255, 0.8);
+  /* Soft glow */
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hover effect */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #0077b6, #023e8a);
+  /* Darker blue */
+  box-shadow: 0px 0px 12px rgba(0, 119, 182, 1);
+}
+
+/* Firefox Support */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #232831 transparent;
+  background: transparent;
 }

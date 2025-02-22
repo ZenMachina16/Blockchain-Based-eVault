@@ -32,7 +32,7 @@ describe("Contract", function () {
       "12345", // Case Number
       "Criminal", // Category
       "Judge Name", // Judge Name
-      linkedClients
+      linkedClients,
     );
 
     const caseDetails = await contract.getFile(1);
@@ -46,15 +46,17 @@ describe("Contract", function () {
     const initialLinkedClients = [client1.address];
 
     // Upload file and link initial clients
-    await contract.connect(courtOfficial).uploadFile(
-      "QmTestHash",
-      "Case Title",
-      "2024-10-08",
-      "12345",
-      "Criminal",
-      "Judge Name",
-      initialLinkedClients
-    );
+    await contract
+      .connect(courtOfficial)
+      .uploadFile(
+        "QmTestHash",
+        "Case Title",
+        "2024-10-08",
+        "12345",
+        "Criminal",
+        "Judge Name",
+        initialLinkedClients,
+      );
 
     // Add additional clients
     await contract.connect(courtOfficial).linkClients(1, [client2.address]);
@@ -62,22 +64,27 @@ describe("Contract", function () {
     const caseDetails = await contract.getFile(1);
 
     // Use 'have.members' to check the clients array without order enforcement
-    expect(caseDetails.linkedClients).to.have.members([client1.address, client2.address]);
+    expect(caseDetails.linkedClients).to.have.members([
+      client1.address,
+      client2.address,
+    ]);
   });
 
   it("Should revert if a non-court-official tries to upload a file", async function () {
     const linkedClients = [client1.address];
 
     await expect(
-      contract.connect(other).uploadFile(
-        "QmTestHash",
-        "Unauthorized Case",
-        "2024-10-08",
-        "54321",
-        "Civil",
-        "Other Judge",
-        linkedClients
-      )
+      contract
+        .connect(other)
+        .uploadFile(
+          "QmTestHash",
+          "Unauthorized Case",
+          "2024-10-08",
+          "54321",
+          "Civil",
+          "Other Judge",
+          linkedClients,
+        ),
     ).to.be.revertedWith("Unauthorized uploader");
   });
 
@@ -85,15 +92,17 @@ describe("Contract", function () {
     const linkedClients = [client1.address];
 
     // Court official uploads a file
-    await contract.connect(courtOfficial).uploadFile(
-      "QmTestHash",
-      "Client Case",
-      "2024-10-08",
-      "56789",
-      "Family",
-      "Judge B",
-      linkedClients
-    );
+    await contract
+      .connect(courtOfficial)
+      .uploadFile(
+        "QmTestHash",
+        "Client Case",
+        "2024-10-08",
+        "56789",
+        "Family",
+        "Judge B",
+        linkedClients,
+      );
 
     // Client retrieves the file
     const caseDetails = await contract.connect(client1).getFile(1);
@@ -104,33 +113,39 @@ describe("Contract", function () {
     const linkedClients = [client1.address];
 
     // Court official uploads a file
-    await contract.connect(courtOfficial).uploadFile(
-      "QmTestHash",
-      "Restricted Case",
-      "2024-10-08",
-      "67890",
-      "Corporate",
-      "Judge C",
-      linkedClients
-    );
+    await contract
+      .connect(courtOfficial)
+      .uploadFile(
+        "QmTestHash",
+        "Restricted Case",
+        "2024-10-08",
+        "67890",
+        "Corporate",
+        "Judge C",
+        linkedClients,
+      );
 
     // Other client attempts to retrieve the file
-    await expect(contract.connect(other).getFile(1)).to.be.revertedWith("Unauthorized access");
+    await expect(contract.connect(other).getFile(1)).to.be.revertedWith(
+      "Unauthorized access",
+    );
   });
 
   it("Should allow searching files by title", async function () {
     const linkedClients = [client1.address];
 
     // Court official uploads a file
-    await contract.connect(courtOfficial).uploadFile(
-      "QmTestHash",
-      "Unique Case Title",
-      "2024-10-08",
-      "98765",
-      "Tax",
-      "Judge D",
-      linkedClients
-    );
+    await contract
+      .connect(courtOfficial)
+      .uploadFile(
+        "QmTestHash",
+        "Unique Case Title",
+        "2024-10-08",
+        "98765",
+        "Tax",
+        "Judge D",
+        linkedClients,
+      );
 
     // Search by title
     const result = await contract.searchByTitle("Unique Case Title");

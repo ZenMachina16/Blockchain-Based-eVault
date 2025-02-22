@@ -1,147 +1,392 @@
-.container {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap");
+
+/* Parent container for sidebar and content */
+.dashboard-container {
+  display: flex;
+  /* Places sidebar and content side by side */
+  align-items: stretch;
+  /* Ensures both grow to the same height */
+  min-height: 100vh;
+  font-family: "Montserrat", sans-serif;
+  /* At least full viewport height */
 }
 
-.image {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures the image covers the entire screen */
+/* Sidebar without fixed height */
+.sidebar {
+  width: 250px;
+  background-color: #587392;
+  color: white;
+  padding-top: 20px;
+  padding-left: 20px;
+
+  /* height: auto; <-- By default it's auto if you remove explicit heights */
 }
 
-.darkcover {
-    position: absolute; /* Ensure it covers the entire container */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(16, 16, 16, 0.57); /* Dark overlay */
-    display: flex;
-    flex-direction: column; /* Stack title and button vertically */
-    justify-content: center; /* Center vertically */
-    align-items: center; /* Center horizontally */
+/* Content area takes remaining space */
+.content-area {
+  flex: 1;
+  /* Grow to fill remaining width */
+  background-color: #fff;
+  /* Example background color */
+  /* Add your own styling here */
 }
 
-.box{
-    width:75vw;
-    height:40vw;
-    display: flex;
-    flex-direction: column;
-    background-color: rgba(255, 255, 255, 0.82);
-    position: absolute; /* Make the button's position relative to the container */
-    top: 50%; /* Adjust position for the button */
-    left: 50%;
-    transform: translate(-50%, -50%); /* Center the button */
-    border-radius: 39px;
-    align-items: center;
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* align-items: center; */
 }
 
-.header{
-    width: 100%;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* background-color: aqua; */
-    font-size: 5vh;
+.sidebar li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 1.3em;
+  height: 60px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: "Montserrat", sans-serif;
 }
 
-.logo {
-    width: 10vw;
-    height: auto;
-    display: flex;;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid black;
-    border-radius: 100%;
-
-    
+.sidebar li:hover {
+  background-color: #2c3e50;
 }
 
-.logo-image {
-    width: 70px; /* Adjust the size as needed */
-    height: auto;
+.placeholder-div {
+  display: flex;
+  width: 100%;
+  height: 24vh;
+  /* background-color: rgb(230, 106, 106); */
+  /* border-radius: 10px; */
+  align-items: center;
 }
 
-.dets{
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    font-size: medium;
-    padding: 0%;
-    margin: 0%;
-    font-size: 1.3vw;
-    font-weight: 1px;
+#welcome {
+  display: flex;
+  justify-content: flex-start;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  padding-left: 70px;
+  width: 50%;
+  font-size: 1.5em;
+}
+#header-home-box {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  /* gap: 15px; */
+  justify-content: center;
+  /* background-color: blue; */
+  height: 100%;
+  width: 100%;
+  /* padding: 10px 100px; */
+  /* margin-top: 30px; */
+
+  /* Space between profile and search bar */
 }
 
-#speciality{
-    margin-top: 4vw;
-    font-size: 2vw;
+#search-bar {
+  width: 100%;
+  height: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 70px;
 }
 
-.registerandfetchbuttons{
-    width: 100%;
-    height: 60px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    /* background-color: aqua; */
-    margin-top: 5%;
+#search-bar-home {
+  border-radius: 8px;
+  width: 250px;
+  height: 10%;
+  box-shadow: none;
+  /* background-color: rgb(255, 221, 127); */
 }
 
-.registercase {
-    display: flex;
-    height: 4vw;
-    width: 15vw;
-    justify-content: center;
-    align-items: center;
-    background-color: #28A745;
-    color: #ffffff;
-    border: none;      /* Removes default border */
-    outline: none;     /* Removes focus outline */
-    padding: 0;        /* Resets padding */
-    text-decoration: none; /* Removes any text decorations */
-    cursor: pointer;   /* Changes cursor to pointer on hover */
-    font-size: inherit; /* Ensures font size matches parent */
-    border-radius: 8px;
-    transition: background-color 0.6s ease, transform 0.10s ease;
-    
+#profile-head {
+  height: 50%;
+  background-color: rgb(253, 202, 135);
 }
 
-.registercase:hover{
-    background-color: #34DF5B;
-    color: #5A5A5A; 
+#profile-logo {
+  /* background-color: rgb(80, 173, 136); */
+  width: 100%;
+  height: 50%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 50px;
 }
 
-
-.fetchcase {
-    display: flex;
-    height: 4vw;
-    width: 15vw;
-    justify-content: center;
-    align-items: center;
-    background-color: #EC6A00;
-    color: #ffffff;
-    border: none;      /* Removes default border */
-    outline: none;     /* Removes focus outline */
-    padding: 0;        /* Resets padding */
-    text-decoration: none; /* Removes any text decorations */
-    cursor: pointer;   /* Changes cursor to pointer on hover */
-    font-size: inherit; /* Ensures font size matches parent */
-    border-radius: 8px;
-    transition: background-color 0.6s ease, transform 0.10s ease;
-
-    
+/* Improved dropdown menu styles for the profile menu */
+#profile-menu .MuiPaper-root {
+  border-radius: 8px;
+  background-color: #ffffff;
+  /* White background for clarity */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow */
+  padding: 8px 0;
 }
 
+#profile-menu .MuiMenuItem-root {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
+}
 
-.fetchcase:hover{
-    background-color: #F68F3B;
-    color: #5A5A5A; 
+#profile-menu .MuiMenuItem-root:hover {
+  background-color: #f0f0f0;
+}
+
+/* Container for all quick-task boxes */
+#quick-taskbar {
+  display: flex;
+  /* Lay them out horizontally */
+  gap: 20px;
+  /* Spacing between boxes */
+  padding: 20px 40px;
+  /* Spacing around the container */
+  background-color: #2c3e50;
+  margin: 10px 40px;
+  border-radius: 10px;
+  height: 280px;
+}
+
+/* Each individual box */
+.task-box {
+  flex: 1;
+  /* Distribute available space evenly */
+  min-width: 180px;
+  /* Prevent boxes from getting too narrow */
+  background-color: #ffffff;
+  /* Box background color */
+  border-radius: 8px;
+  /* Rounded corners */
+  padding: 20px;
+  /* Inner spacing */
+  color: #333;
+  /* Text color */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Subtle box shadow */
+  text-align: center;
+}
+
+.task-box h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  /* If you're using Montserrat globally, it should apply here as well */
+}
+
+.task-box p {
+  margin: 4px 0;
+  font-family: "Montserrat", sans-serif;
+}
+
+/* Upload Now button or any call-to-action */
+.task-box button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #2c3e50;
+  /* Adjust color to match your theme */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: "Montserrat", sans-serif;
+  cursor: pointer;
+}
+
+.task-box button:hover {
+  background-color: #34495e;
+}
+
+#quick-taskbar .task-box:nth-child(1) {
+  background-color: #d1e7ff;
+}
+
+#quick-taskbar .task-box:nth-child(2) {
+  background-color: #d1e7ff;
+}
+
+#quick-taskbar .task-box:nth-child(3) {
+  background-color: #ffebee;
+}
+
+#quick-taskbar .task-box:nth-child(4) {
+  background-color: #fff3e0;
+}
+
+/* For the Active Cases box - simple text lines for each stat */
+.progress-info > div {
+  margin: 4px 0;
+  font-family: "Montserrat", sans-serif;
+}
+
+/* For the Deadlines box - example styling for the list */
+.task-box ul {
+  margin: 0;
+  padding: 8px 10px 8px 23px;
+  background-color: #ff6f61;
+  border-radius: 5px;
+  color: #ffff;
+  font-family: "Montserrat", sans-serif;
+  /* Indent bullet points */
+}
+
+.task-box li {
+  font-family: "Montserrat", sans-serif;
+}
+
+/* ------------------- */
+/* Recent Cases Section */
+/* ------------------- */
+
+#recent-cases {
+  padding: 38px 40px 40px 40px;
+  font-family: "Montserrat", sans-serif;
+  /* background-color: #333; */
+}
+
+#recent-cards {
+  background-color: #3d3d3d;
+  padding: 15px 10px 10px 0px;
+  border-radius: 6px;
+}
+#recent-cases h2 {
+  font-size: 1.6rem;
+  margin: 0px;
+  font-weight: 500;
+  padding: none;
+  font-family: "Montserrat", sans-serif;
+  /* background-color: #2C3E50; */
+}
+
+#recent-cases > p {
+  margin-top: 0%;
+  margin-bottom: 20px;
+  color: #000000;
+  font-size: 1.3em;
+  padding: 0px;
+  font-family: "Montserrat", sans-serif;
+  font-style: italic;
+  /* background-color: #4CAF50; */
+}
+
+/* Individual case cards */
+.case-card {
+  background-color: #fff3e0;
+  border: 1px solid #e5d6be;
+  border-radius: 5px;
+  /* padding: 20px; */
+  margin-bottom: 20px;
+  width: 100%;
+  height: 30vh;
+}
+
+.case-card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  display: flex;
+  text-align: left;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffe0b2;
+  border: 1px solid #d9bc91;
+  height: 50px;
+  width: 100%;
+  border-radius: 5px 5px 0px 0px;
+  text-transform: uppercase;
+  font-family: "Montserrat", sans-serif;
+}
+
+/* Layout for each case’s details */
+.case-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.case-left,
+.case-right {
+  width: 45%;
+  /* background-color: #D1E7FF; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+  font-size: 1.3em;
+}
+
+.case-left p,
+.case-right p {
+  font-family: "Montserrat", sans-serif;
+}
+/* Buttons within the case cards */
+.view-details {
+  background-color: #4caf50;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-family: "Montserrat", sans-serif;
+}
+
+.view-details:hover {
+  background-color: #34495e;
+}
+
+.add-document {
+  background-color: #ff9900;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.add-document:hover {
+  background-color: #e68a00;
+}
+
+.task-box.box-taskboard p {
+  /* Your styles here */
+  font-size: 1.1em;
+  color: #ffffff;
+  background-color: #4caf50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+  height: 30px;
+  border-radius: 4px;
+}
+
+#tasks p:nth-child(1) {
+  background-color: #ff9800;
+}
+
+#tasks p:nth-child(2) {
+  background-color: #4caf50;
+}
+
+#tasks {
+  background-color: #ffffff;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  border: 1px solid black;
 }
