@@ -6,6 +6,7 @@ import Register from "./components/Register"; // Import the Register component
 import LawyerDashboard from "./components/LawyerDashboard";
 import FileManagement from "./components/FileManagement";
 import FetchFileComponent from "./components/FetchFileComponent";
+import UploadPage from "./components/UploadPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/register" element={<Register />} />{" "}
         {/* Added register route */}
         <Route path="/lawyer-dashboard" element={<LawyerDashboard />} />
+        <Route path="/UploadPage" element={<UploadPage />} />
         <Route path="/file-management" element={<FileManagement />} />
         <Route path="/fetch-file" element={<FetchFileComponent />} />
       </Routes>
