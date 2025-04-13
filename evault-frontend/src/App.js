@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Homepage from "./components/Homepage";
 import Login from "./components/Login";
 import Register from "./components/Register"; // Import the Register component
@@ -16,7 +16,7 @@ import EditCaseForm from "./components/EditCaseForm";
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <BrowserRouter>
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/login" element={<Login />} />
@@ -24,14 +24,14 @@ function App() {
           {/* Added register route */}
           <Route path="/lawyer-dashboard" element={<LawyerDashboard />} />
           <Route path="/client-dashboard" element={<ClientDashboard />} />
-          <Route path="/UploadPage" element={<UploadPage />} />
-          <Route path="/file-management" element={<FileManagement />} />
+          <Route path="/upload" element={<UploadPage />} />
+          <Route path="/files" element={<FileManagement />} />
           <Route path="/fetch-file" element={<FetchFileComponent />} />
-          <Route path="/cases/create" element={<CaseForm />} />
-          <Route path="/case-details/:caseId" element={<CaseDetails />} />
+          <Route path="/create-case" element={<CaseForm />} />
+          <Route path="/case/:id" element={<CaseDetails />} />
           <Route path="/edit-case/:caseId" element={<EditCaseForm />} />
         </Routes>
-      </Router>
+      </BrowserRouter>
     </AuthProvider>
   );
 }

@@ -38,12 +38,12 @@ const LawyerDashboard = () => {
 
   // Navigate to Summariser page
   const handleSummariserClick = () => {
-    navigate("/UploadPage");
+    navigate("/upload");
   };
 
   // Navigate to Create Case page
   const handleCreateCaseClick = () => {
-    navigate("/cases/create");
+    navigate("/create-case");
   };
 
   // Fetch cases for the lawyer
@@ -84,7 +84,7 @@ const LawyerDashboard = () => {
 
   // Handle case click to view details
   const handleCaseClick = (caseId) => {
-    navigate(`/case-details/${caseId}`);
+    navigate(`/case/${caseId}`);
   };
 
   // Format date for display
@@ -103,7 +103,7 @@ const LawyerDashboard = () => {
             Summariser
           </li>
           <li
-            onClick={() => navigate("/file-management")}
+            onClick={() => navigate("/files")}
             style={{ cursor: "pointer" }}
           >
             Upload Documents
@@ -207,7 +207,7 @@ const LawyerDashboard = () => {
             />
             <h3>Total 245 Documents</h3>
             <p>Uploaded Till Now</p>
-            <button onClick={() => navigate("/file-management")}>
+            <button onClick={() => navigate("/files")}>
               Upload Now
             </button>
           </div>
