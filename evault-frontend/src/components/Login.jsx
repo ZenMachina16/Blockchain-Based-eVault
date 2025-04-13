@@ -1,12 +1,93 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import "./CSS/Login.css"; // Ensure this path is correct
+
+// const Login = () => {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [error, setError] = useState("");
+//   const navigate = useNavigate();
+
+//   const handleLogin = async (e) => {
+//     e.preventDefault();
+//     try {
+//       const response = await fetch("http://localhost:5000/auth/login", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ email, password }),
+//       });
+//       const data = await response.json();
+//       if (response.ok) {
+//         console.log("Login successful:", data);
+//         localStorage.setItem("token", data.token);
+//         navigate("/lawyer-dashboard");
+//       } else {
+//         setError(data.message || "Login failed");
+//       }
+//     } catch (err) {
+//       console.error(err);
+//       setError("An error occurred during login.");
+//     }
+//   };
+
+//   return (
+//     <div className="login">
+//       <div className="overlay"></div>
+//       <div id="evault">Evault</div>
+//       <form onSubmit={handleLogin}>
+//         <div className="form-content">
+//           <div className="input-container">
+//             <label>Email:</label>
+//             <input
+//               type="email"
+//               value={email}
+//               onChange={(e) => setEmail(e.target.value)}
+//               required
+//             />
+//           </div>
+//           <div className="input-container">
+//             <label>Password:</label>
+//             <input
+//               type="password"
+//               value={password}
+//               onChange={(e) => setPassword(e.target.value)}
+//               required
+//             />
+//           </div>
+//           {error && <p className="alert">{error}</p>}
+//         </div>
+//         <button type="submit">Login</button>
+//       <p id="registerPrompt">
+//   Don't have an account?{" "}
+//   <button
+//     type="button"
+//     className="link-button"
+//     onClick={() => navigate("/register")}
+//   >
+//     Register here
+//   </button>
+// </p>
+
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default Login;
+
+
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import "./CSS/Login.css"; // Ensure this path is correct
+import { jwtDecode } from "jwt-decode";
+import { AuthContext } from "../context/AuthContext";
+import "./CSS/Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,11 +97,21 @@ const Login = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+
       const data = await response.json();
       if (response.ok) {
-        console.log("Login successful:", data);
         localStorage.setItem("token", data.token);
-        navigate("/lawyer-dashboard");
+        const decoded = jwtDecode(data.token);
+        login(data.token);
+
+        // Redirect based on role
+        if (decoded.role === "lawyer" || decoded.role === "admin") {
+          navigate("/lawyer-dashboard");
+        } else if (decoded.role === "client") {
+          navigate("/client-dashboard");
+        } else {
+          setError("Unauthorized user role");
+        }
       } else {
         setError(data.message || "Login failed");
       }
@@ -32,12 +123,11 @@ const Login = () => {
 
   return (
     <div className="login">
-      <div className="overlay"></div>
-      <div id="evault">Evault</div>
-      <form onSubmit={handleLogin}>
+      <div className="login-overlay"></div>
+      <form id="login-form" onSubmit={handleLogin}>
         <div className="form-content">
           <div className="input-container">
-            <label>Email:</label>
+            <label id="login-label">Email:</label>
             <input
               type="email"
               value={email}
@@ -46,7 +136,7 @@ const Login = () => {
             />
           </div>
           <div className="input-container">
-            <label>Password:</label>
+            <label id="login-label">Password:</label>
             <input
               type="password"
               value={password}
@@ -56,18 +146,19 @@ const Login = () => {
           </div>
           {error && <p className="alert">{error}</p>}
         </div>
-        <button type="submit">Login</button>
-      <p id="registerPrompt">
-  Don't have an account?{" "}
-  <button
-    type="button"
-    className="link-button"
-    onClick={() => navigate("/register")}
-  >
-    Register here
-  </button>
-</p>
-
+        <button id="login-btn" type="submit">
+          Login
+        </button>
+        <p id="registerPrompt">
+          Don't have an account?{" "}
+          <button
+            type="button"
+            id="link-button-login"
+            onClick={() => navigate("/register")}
+          >
+            Register here
+          </button>
+        </p>
       </form>
     </div>
   );

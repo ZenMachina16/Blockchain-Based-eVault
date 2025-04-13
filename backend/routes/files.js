@@ -12,7 +12,7 @@ router.get("/", authenticateToken, async (req, res) => {
 
   const NavinEvault = await ethers.getContractFactory("NavinEvault");
   const contract = await NavinEvault.attach(
-    process.env.NAVINEVAULT_CONTRACT_ADDRESS,
+    process.env.NAVINEVAULT_CONTRACT_ADDRESS
   );
 
   try {
@@ -56,14 +56,26 @@ router.get("/", authenticateToken, async (req, res) => {
 
 // GET /files/metadata/:filename - retrieve metadata for a specific file from memory
 router.get("/metadata/:filename", authenticateToken, (req, res) => {
-  const filename = req.params.filename;
-  const metadata = fileMetadata[filename];
+  // Trim whitespace from the filename
+  const filename = req.params.filename.trim();
+  console.log(`Fetching metadata for filename: "${filename}"`);
+
+  // Attempt direct lookup
+  let metadata = fileMetadata[filename];
+
+  // If not found and filename ends with .pdf, try removing the extension
+  if (!metadata && filename.toLowerCase().endsWith(".pdf")) {
+    const baseFilename = filename.slice(0, -4);
+    metadata = fileMetadata[baseFilename];
+  }
+
   if (metadata) {
     res.json({
       message: "Metadata retrieved successfully",
       metadata,
     });
   } else {
+    console.warn(`Metadata not found for filename: ${filename}`);
     res
       .status(404)
       .json({ message: "Metadata not found for the specified file" });

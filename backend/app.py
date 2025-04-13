@@ -7,6 +7,7 @@ import heapq
 from collections import Counter
 from pdfminer.high_level import extract_text
 from flask_cors import CORS
+from datetime import datetime
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -52,12 +53,17 @@ def detect_risks(text):
     return list(set(token.text for token in nlp(text.lower()) if token.text in RISK_WORDS))
 
 # Function to generate a PDF report
-def generate_pdf_report(summary, clauses, risks, updates, pdf_path="Analysis_Results.pdf"):
+def generate_pdf_report(case_name, summary, clauses, risks, updates, pdf_path):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
-    pdf.cell(200, 10, "Legal Document Analysis Report", ln=True, align="C")
+    
+    # Add Case Name and Timestamp
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    pdf.cell(200, 10, f"{case_name} Report", ln=True, align="C")
+    pdf.set_font("Arial", "", 12)
+    pdf.cell(200, 10, f"Generated on: {timestamp}", ln=True, align="C")
     pdf.ln(10)
 
     pdf.set_font("Arial", "B", 12)
@@ -86,17 +92,6 @@ def generate_pdf_report(summary, clauses, risks, updates, pdf_path="Analysis_Res
     pdf.output(pdf_path)
     return pdf_path
 
-# Function to process the PDF
-def process_pdf(pdf_path):
-    text = extract_text_from_pdf(pdf_path)
-    summary = summarize_text(text)
-    clauses = extract_key_clauses(text)
-    risks = detect_risks(text)
-    updates = get_regulatory_updates()
-
-    pdf_path = generate_pdf_report(summary, clauses, risks, updates)
-    return pdf_path
-
 # Mock function to return regulatory updates
 def get_regulatory_updates():
     return [
@@ -104,15 +99,27 @@ def get_regulatory_updates():
         {"title": "Compliance Update", "summary": "Updated guidelines on contract enforcement and risk mitigation."}
     ]
     
-    
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB limit
 
 @app.route('/')
 def home():
     return "Flask server is running on port 5001!"
 
+# Function to process the uploaded PDF
+def process_pdf(pdf_path):
+    text = extract_text_from_pdf(pdf_path)
+    summary = summarize_text(text)
+    clauses = extract_key_clauses(text)
+    risks = detect_risks(text)
+    updates = get_regulatory_updates()
 
-# Endpoint to upload PDF
+    case_name = os.path.splitext(os.path.basename(pdf_path))[0]  # Extract file-name without extension
+    report_filename = f"{case_name}_report.pdf"
+    report_path = os.path.join(app.config['UPLOAD_FOLDER'], report_filename)
+
+    return generate_pdf_report(case_name, summary, clauses, risks, updates, report_path)
+
+# Endpoint to upload and process PDF
 @app.route('/upload', methods=['POST'])
 def upload_pdf():
     if 'file' not in request.files:
@@ -135,4 +142,4 @@ def upload_pdf():
     return send_file(generated_pdf, as_attachment=True, download_name="summary_report.pdf")
 
 if __name__ == '__main__':
-     app.run(debug=True, port=5001)
+    app.run(debug=True, port=5001)

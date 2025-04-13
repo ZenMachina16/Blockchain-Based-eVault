@@ -1,0 +1,161 @@
+.case-form-container {
+  max-width: 800px;
+  margin: 40px auto;
+  /* Adjusted padding so the container’s bottom edge lines up with the button */
+  padding: 30px 30px 20px 30px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.case-form-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.case-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  /* Remove any default bottom margin to keep container tight */
+  margin-bottom: 0;
+}
+
+.form-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 25px;
+  background-color: #f9f9f9;
+}
+
+.form-section h3 {
+  margin: 0;
+  margin-bottom: 15px;
+  color: #34495e;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #2980b9;
+  box-shadow: 0 0 5px rgba(41, 128, 185, 0.3);
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* Adjust the actions so they sit neatly at the bottom of the container */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 20px;
+  /* No extra padding so that the container’s border extends to the button */
+  padding-bottom: 0;
+}
+
+.form-actions button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button {
+  background-color: #2980b9;
+  color: #fff;
+}
+
+.submit-button:hover {
+  background-color: #1c5980;
+}
+
+.submit-button:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background-color: #ecf0f1;
+  color: #7f8c8d;
+}
+
+.cancel-button:hover {
+  background-color: #d0d7de;
+}
+
+.error-message,
+.success-message {
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.error-message {
+  background-color: #f2dede;
+  color: #a94442;
+  border: 1px solid #ebccd1;
+}
+
+.success-message {
+  background-color: #dff0d8;
+  color: #3c763d;
+  border: 1px solid #d6e9c6;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .case-form-container {
+    padding: 20px;
+    margin: 20px;
+  }
+  
+  .form-section {
+    padding: 20px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
+}

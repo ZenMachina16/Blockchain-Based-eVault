@@ -8,29 +8,46 @@ const FetchFileComponent = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const fetchFileMetadata = async () => {
+    const token = localStorage.getItem("token");
+    const trimmedFilename = filenameToFetch.trim();
+
+    if (!trimmedFilename) {
+      setErrorMessage("Filename cannot be empty.");
+      return;
+    }
+
     try {
+      console.log(`Fetching metadata for: ${trimmedFilename}`);
+      const encodedFilename = encodeURIComponent(trimmedFilename);
+
       const response = await axios.get(
-        `http://localhost:5000/metadata/${filenameToFetch}`,
+        `http://localhost:5000/files/metadata/${encodedFilename}`,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
       );
+
+      console.log("Metadata received:", response.data);
       setFetchedMetadata(response.data.metadata);
       setErrorMessage("");
     } catch (error) {
       console.error("Error fetching file metadata:", error);
       setErrorMessage(
-        `Error fetching metadata: ${error.response?.data?.message || error.message}`,
+        `Error fetching metadata: ${
+          error.response?.data?.message || error.message
+        }`
       );
-      setFetchedMetadata(null); // Clear previously fetched metadata on error
+      setFetchedMetadata(null);
     }
   };
 
   return (
-    <>
-      <div className="background-image"></div> {/* Background image */}
+    <div className="fetch-file-component">
+      <div className="background-image"></div>
       <div className="overlay">
-        {" "}
-        {/* Dark overlay */}
-        <h2 className="main-heading">SEARCH A CASE FILE</h2>{" "}
-        {/* Main heading */}
+        <h2 className="main-heading">SEARCH A CASE FILE</h2>
         <div className="fetch-container">
           <div className="fetch-input-button">
             <input
@@ -42,7 +59,7 @@ const FetchFileComponent = () => {
             <button onClick={fetchFileMetadata}>Fetch Metadata</button>
           </div>
 
-          {errorMessage && <p>{errorMessage}</p>}
+          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
           {fetchedMetadata && (
             <div className="metadata-container">
@@ -71,7 +88,7 @@ const FetchFileComponent = () => {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

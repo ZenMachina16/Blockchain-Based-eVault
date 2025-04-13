@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../models/User"); // Your updated Mongoose model
+const { authenticateToken } = require("../middleware/auth");
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
@@ -67,6 +68,26 @@ router.post("/login", async (req, res) => {
     res.json({ token });
   } catch (error) {
     console.error("Error during login:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// In your backend user-routes.js
+router.get("/check-client/:email", authenticateToken, async (req, res) => {
+  try {
+    const client = await User.findOne({ 
+      email: req.params.email,
+      role: "client" 
+    });
+    
+    if (!client) {
+      return res.status(404).json({ message: "Client not found" });
+    }
+    
+    // Client exists
+    res.status(200).json({ message: "Client found" });
+  } catch (error) {
+    console.error("Error checking client:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });

@@ -1,0 +1,229 @@
+/* * {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: "Inter", sans-serif;
+    background-color: #666565;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bg-reg-container{
+    background-color: #706e6e;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    display: flex;  
+}
+
+.register-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+form {
+    background-color: #333333;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 0 auto;
+    color: rgb(58, 56, 56);
+}
+
+#register-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.register-message {
+    color: #ffcc00;
+    text-align: center;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+label {
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+input::placeholder {
+    color: #ffffff;
+    opacity: 0.7;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+.connect-metamask {
+    background-color: #ff9800;
+}
+
+.connect-metamask:hover {
+    background-color: #e68900;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    color: #f09b28;
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+}
+
+#loginPrompt {
+    color: #ffffff;
+    text-align: center;
+} */
+
+* {
+    box-sizing: border-box;
+}
+
+
+.register-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+.bg-reg-container{
+    background-color: #706e6e;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    display: flex;  
+}
+
+form {
+    background-color: #333333;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 0 auto;
+    color: white;
+}
+
+#register-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.register-message {
+    color: #ffcc00;
+    text-align: center;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+label {
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+input::placeholder {
+    color: #ffffff;
+    opacity: 0.7;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+.connect-metamask {
+    background-color: #ff9800;
+}
+
+.connect-metamask:hover {
+    background-color: #e68900;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    color: #f09b28;
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+}
+
+#loginPrompt {
+    color: #ffffff;
+    text-align: center;
+}

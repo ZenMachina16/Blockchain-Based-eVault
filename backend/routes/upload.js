@@ -1,13 +1,10 @@
 const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
-const {
-  uploadToPinata,
-  storeHashInContract,
-} = require("../../scripts/pinataIntegration");
+const { uploadToPinata, storeHashInContract } = require("../../scripts/pinataIntegration");
 const { ethers } = require("hardhat");
 const { authenticateToken } = require("../middleware/auth");
-const fileMetadata = require("../data/fileMetadata");
+const FileMetadata = require("../models/FileMetadata");
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
@@ -19,23 +16,9 @@ router.post("/", authenticateToken, upload.single("file"), async (req, res) => {
   }
 
   // Extract metadata from the request body
-  const {
-    title,
-    dateOfJudgment,
-    caseNumber,
-    category,
-    judgeName,
-    linkedClients,
-  } = req.body;
+  const { title, dateOfJudgment, caseNumber, category, judgeName, linkedClients } = req.body;
   console.log("Uploaded file:", req.file);
-  console.log("Metadata:", {
-    title,
-    dateOfJudgment,
-    caseNumber,
-    category,
-    judgeName,
-    linkedClients,
-  });
+  console.log("Metadata:", { title, dateOfJudgment, caseNumber, category, judgeName, linkedClients });
 
   try {
     // Upload file to Pinata
@@ -56,33 +39,33 @@ router.post("/", authenticateToken, upload.single("file"), async (req, res) => {
       caseNumber,
       category,
       judgeName,
-      clientsArray,
+      clientsArray
     );
 
-    // Save metadata in the shared in-memory store using the filename as the key
-    fileMetadata[req.file.filename] = {
+    // Save metadata in MongoDB using the original file name as key
+    const metadataEntry = new FileMetadata({
+      originalname: req.file.originalname,
       title,
       dateOfJudgment,
       caseNumber,
       category,
       judgeName,
       linkedClients: clientsArray,
+      ipfsHash,
       uploader: req.file.originalname,
       timestamp: new Date(),
-      ipfsHash,
-    };
+    });
+    await metadataEntry.save();
 
     res.json({
       message: "File uploaded successfully",
       file: req.file,
       ipfsHash,
-      metadata: fileMetadata[req.file.filename],
+      metadata: metadataEntry,
     });
   } catch (error) {
     console.error("Error during upload and storage process:", error);
-    res
-      .status(500)
-      .json({ message: "Error processing the upload", error: error.message });
+    res.status(500).json({ message: "Error processing the upload", error: error.message });
   } finally {
     // Clean up the file from local storage
     fs.unlink(req.file.path, (err) => {

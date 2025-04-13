@@ -19,6 +19,8 @@ mongoose
 const authRoutes = require("./routes/auth-routes");
 const uploadRoutes = require("./routes/upload");
 const filesRoutes = require("./routes/files");
+const caseRoutes = require("./routes/caseRoutes");
+app.use("/api/cases", caseRoutes);
 
 app.use("/auth", authRoutes);
 app.use("/upload", uploadRoutes);

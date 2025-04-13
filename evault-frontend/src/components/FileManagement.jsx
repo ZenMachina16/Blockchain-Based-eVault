@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./CSS/FileManagement.css"; // Import your CSS file
+import "./CSS/FileManagement.css"; // Import the updated CSS file
 
 const FileManagement = () => {
   const [file, setFile] = useState(null);
@@ -28,23 +28,21 @@ const FileManagement = () => {
     formData.append("judgeName", judgeName);
     formData.append("linkedClients", JSON.stringify(linkedClients));
 
+    // Retrieve token from localStorage (or sessionStorage)
+    const token = localStorage.getItem("token");
+
     try {
-      const response = await axios.post(
-        "http://localhost:5000/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      const response = await axios.post("http://localhost:5000/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`,
         },
-      );
+      });
       console.log(response.data);
       alert("File uploaded successfully!");
     } catch (error) {
       console.error("Error uploading file:", error);
-      alert(
-        `Error uploading file: ${error.response?.data?.message || error.message}`,
-      );
+      alert(`Error uploading file: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -55,99 +53,85 @@ const FileManagement = () => {
   };
 
   return (
-    <div className="file-management">
-      <div className="darkcover">
-        <div className="head">CASE FILE UPLOAD</div>
-        <div className="mukhya">Case Information</div>{" "}
-        {/* Move Case Information heading here */}
-        <form onSubmit={handleUpload}>
-          <div id="form1">
-            <div className="input1">
-              <label htmlFor="caseTitle">Case Title:</label>
-              <input
-                type="text"
-                id="caseTitle"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input1">
-              <label htmlFor="caseType">Case Type:</label>
-              <input
-                type="text"
-                id="caseType"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
-              />
-            </div>
-            {/* <div className="input1"> 
-                                <label htmlFor="caseDescription">Case Description:</label>
-                                <input 
-                                    type="text" 
-                                    id="case description" 
-                                    value={category}
-                                    onChange={(e) => setCategory(e.target.value)} 
-                                    required 
-                                />
-                            </div> */}
-            <div className="input1">
-              <label htmlFor="judgeName">Judge Name:</label>
-              <input
-                type="text"
-                id="judgeName"
-                value={judgeName}
-                onChange={(e) => setJudgeName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input1">
-              <label htmlFor="caseNumber">Case Number:</label>
-              <input
-                type="text"
-                id="caseNumber"
-                value={caseNumber}
-                onChange={(e) => setCaseNumber(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input1">
-              <label htmlFor="dateOfJudgment">Date of Judgment:</label>
-              <input
-                type="date"
-                id="dateOfJudgment"
-                value={dateOfJudgment}
-                onChange={(e) => setDateOfJudgment(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input1">
-              <label htmlFor="linkedClients">Linked Clients:</label>
-              <input
-                type="text"
-                id="linkedClients"
-                onChange={handleLinkedClientsChange}
-                placeholder="Comma-separated client IDs"
-              />
-            </div>
-            <div className="input1">
-              <label htmlFor="fileUpload">Upload File:</label>
-              <input
-                type="file"
-                id="fileUpload"
-                accept=".pdf,.doc,.docx,.txt" // Adjust accepted file types as needed
-                onChange={handleFileChange}
-                required
-              />
-            </div>
-          </div>
-          <div className="button-container">
-            <button type="submit">Upload</button>
-          </div>
-        </form>
-        {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-      </div>
+    <div className="file-upload-management">
+      <div className="file-upload-darkcover"></div>
+      <div className="file-upload-head">CASE FILE UPLOAD</div>
+      <div className="file-upload-mukhya">Case Information</div>
+      <form className="file-upload-form" onSubmit={handleUpload}>
+        <div className="file-upload-input-group">
+          <label htmlFor="caseTitle">Case Title:</label>
+          <input
+            type="text"
+            id="caseTitle"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </div>
+        <div className="file-upload-input-group">
+          <label htmlFor="caseType">Case Type:</label>
+          <input
+            type="text"
+            id="caseType"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+          />
+        </div>
+        <div className="file-upload-input-group">
+          <label htmlFor="judgeName">Judge Name:</label>
+          <input
+            type="text"
+            id="judgeName"
+            value={judgeName}
+            onChange={(e) => setJudgeName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="file-upload-input-group">
+          <label htmlFor="caseNumber">Case Number:</label>
+          <input
+            type="text"
+            id="caseNumber"
+            value={caseNumber}
+            onChange={(e) => setCaseNumber(e.target.value)}
+            required
+          />
+        </div>
+        <div className="file-upload-input-group">
+          <label htmlFor="dateOfJudgment">Date of Judgment:</label>
+          <input
+            type="date"
+            id="dateOfJudgment"
+            value={dateOfJudgment}
+            onChange={(e) => setDateOfJudgment(e.target.value)}
+            required
+          />
+        </div>
+        <div className="file-upload-input-group">
+          <label htmlFor="linkedClients">Linked Clients:</label>
+          <input
+            type="text"
+            id="linkedClients"
+            onChange={handleLinkedClientsChange}
+            placeholder="Comma-separated client IDs"
+          />
+        </div>
+        <div className="file-upload-input-group">
+          <label htmlFor="fileUpload">Upload File:</label>
+          <input
+            type="file"
+            id="fileUpload"
+            accept=".pdf,.doc,.docx,.txt"
+            onChange={handleFileChange}
+            required
+          />
+        </div>
+        <div className="file-upload-button-container">
+          <button type="submit" className="file-upload-button">Upload</button>
+        </div>
+      </form>
+      {errorMessage && <p className="error-message">{errorMessage}</p>}
     </div>
   );
 };
