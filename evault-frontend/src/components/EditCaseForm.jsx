@@ -1,30 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import "./CSS/CaseForm.css";
+import { useParams, useNavigate } from "react-router-dom";
+import "./CSS/CaseManagementForm.css";
 
-const CaseForm = () => {
+const EditCaseForm = () => {
+  const { caseId } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [caseTypes] = useState(["Civil", "Criminal", "Family", "Corporate"]);
-  const [status] = useState(["Open", "In Progress", "Closed"]);
-
-  // Case form state
   const [caseData, setCaseData] = useState({
     clientName: "",
     clientEmail: "",
     caseTitle: "",
     caseDescription: "",
-    caseType: "Civil",
-    status: "Open",
+    caseType: "",
+    status: "",
     summary: "",
-    filingDate: new Date().toISOString().split("T")[0],
+    filingDate: "",
     partiesInvolved: {
       opposingPartyName: "",
       opposingCounsel: "",
-      opposingContact: "",
     },
     courtDetails: {
       courtName: "",
@@ -32,24 +28,59 @@ const CaseForm = () => {
     },
   });
 
+  useEffect(() => {
+    const fetchCaseDetails = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setError("Authentication required");
+          setLoading(false);
+          navigate("/login");
+          return;
+        }
+
+        const response = await axios.get(
+          `http://localhost:5000/api/cases/${caseId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setCaseData(response.data);
+        setLoading(false);
+      } catch (err) {
+        setLoading(false);
+        if (err.response) {
+          setError(err.response.data.message || "Failed to load case details");
+        } else {
+          setError("Network error. Please try again.");
+        }
+      }
+    };
+
+    fetchCaseDetails();
+  }, [caseId, navigate]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-
+    
     // Handle nested objects
     if (name.includes(".")) {
       const [parent, child] = name.split(".");
-      setCaseData((prev) => ({
-        ...prev,
+      setCaseData({
+        ...caseData,
         [parent]: {
-          ...prev[parent],
+          ...caseData[parent],
           [child]: value,
         },
-      }));
+      });
     } else {
-      setCaseData((prev) => ({
-        ...prev,
+      setCaseData({
+        ...caseData,
         [name]: value,
-      }));
+      });
     }
   };
 
@@ -57,57 +88,62 @@ const CaseForm = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(false);
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Authentication required");
         setLoading(false);
+        navigate("/login");
         return;
       }
 
-      // Proceed with case creation
-      const response = await axios.post(
-        "http://localhost:5000/api/cases/create",
+      await axios.put(
+        `http://localhost:5000/api/cases/${caseId}`,
         caseData,
         {
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
         }
       );
 
       setSuccess(true);
       setLoading(false);
-
-      // Redirect to the case details page
+      
+      // Redirect to case details page after successful update
       setTimeout(() => {
-        navigate(`/case/${response.data._id}`);
+        navigate(`/case-details/${caseId}`);
       }, 2000);
     } catch (err) {
       setLoading(false);
       if (err.response) {
-        setError(err.response.data.message || "Failed to create case");
+        setError(err.response.data.message || "Failed to update case");
       } else {
         setError("Network error. Please try again.");
       }
     }
   };
+
+  if (loading) return <div className="loading">Loading case details...</div>;
+
+  if (error) return <div className="error-message">{error}</div>;
+
   return (
     <div className="case-form-container">
-      <h2>Create New Case</h2>
-
-      {error && <div className="error-message">{error}</div>}
+      <h2>Edit Case</h2>
       {success && (
-        <div className="success-message">Case created successfully!</div>
+        <div className="success-message">
+          Case updated successfully! Redirecting...
+        </div>
       )}
-
       <form onSubmit={handleSubmit} className="case-form">
         <div className="form-section">
           <h3>Basic Information</h3>
           <div className="form-group">
-            <label htmlFor="clientName">Client Name *</label>
+            <label htmlFor="clientName">Client Name</label>
             <input
               type="text"
               id="clientName"
@@ -115,12 +151,10 @@ const CaseForm = () => {
               value={caseData.clientName}
               onChange={handleChange}
               required
-              placeholder="Enter client's full name"
             />
           </div>
-
           <div className="form-group">
-            <label htmlFor="clientEmail">Client Email *</label>
+            <label htmlFor="clientEmail">Client Email</label>
             <input
               type="email"
               id="clientEmail"
@@ -128,12 +162,10 @@ const CaseForm = () => {
               value={caseData.clientEmail}
               onChange={handleChange}
               required
-              placeholder="Enter client's email address"
             />
           </div>
-
           <div className="form-group">
-            <label htmlFor="caseTitle">Case Title *</label>
+            <label htmlFor="caseTitle">Case Title</label>
             <input
               type="text"
               id="caseTitle"
@@ -143,9 +175,8 @@ const CaseForm = () => {
               required
             />
           </div>
-
           <div className="form-group">
-            <label htmlFor="caseType">Case Type *</label>
+            <label htmlFor="caseType">Case Type</label>
             <select
               id="caseType"
               name="caseType"
@@ -153,14 +184,15 @@ const CaseForm = () => {
               onChange={handleChange}
               required
             >
-              {caseTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
+              <option value="">Select Case Type</option>
+              <option value="Civil">Civil</option>
+              <option value="Criminal">Criminal</option>
+              <option value="Family">Family</option>
+              <option value="Corporate">Corporate</option>
+              <option value="Immigration">Immigration</option>
+              <option value="Other">Other</option>
             </select>
           </div>
-
           <div className="form-group">
             <label htmlFor="status">Status</label>
             <select
@@ -168,42 +200,41 @@ const CaseForm = () => {
               name="status"
               value={caseData.status}
               onChange={handleChange}
+              required
             >
-              {status.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
+              <option value="">Select Status</option>
+              <option value="Active">Active</option>
+              <option value="Pending">Pending</option>
+              <option value="Closed">Closed</option>
+              <option value="On Hold">On Hold</option>
             </select>
           </div>
-
           <div className="form-group">
             <label htmlFor="filingDate">Filing Date</label>
             <input
               type="date"
               id="filingDate"
               name="filingDate"
-              value={caseData.filingDate}
+              value={caseData.filingDate ? caseData.filingDate.split('T')[0] : ""}
               onChange={handleChange}
+              required
             />
           </div>
         </div>
 
         <div className="form-section">
           <h3>Case Description</h3>
-
           <div className="form-group">
-            <label htmlFor="caseDescription">Description *</label>
+            <label htmlFor="caseDescription">Description</label>
             <textarea
               id="caseDescription"
               name="caseDescription"
               value={caseData.caseDescription}
               onChange={handleChange}
-              rows="4"
+              rows="5"
               required
-            ></textarea>
+            />
           </div>
-
           <div className="form-group">
             <label htmlFor="summary">Summary</label>
             <textarea
@@ -212,13 +243,12 @@ const CaseForm = () => {
               value={caseData.summary}
               onChange={handleChange}
               rows="3"
-            ></textarea>
+            />
           </div>
         </div>
 
         <div className="form-section">
           <h3>Opposing Party Information</h3>
-
           <div className="form-group">
             <label htmlFor="partiesInvolved.opposingPartyName">
               Opposing Party Name
@@ -231,7 +261,6 @@ const CaseForm = () => {
               onChange={handleChange}
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="partiesInvolved.opposingCounsel">
               Opposing Counsel
@@ -248,7 +277,6 @@ const CaseForm = () => {
 
         <div className="form-section">
           <h3>Court Information</h3>
-
           <div className="form-group">
             <label htmlFor="courtDetails.courtName">Court Name</label>
             <input
@@ -259,7 +287,6 @@ const CaseForm = () => {
               onChange={handleChange}
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="courtDetails.judgeName">Judge Name</label>
             <input
@@ -273,13 +300,17 @@ const CaseForm = () => {
         </div>
 
         <div className="form-actions">
-          <button type="submit" className="submit-button" disabled={loading}>
-            {loading ? "Creating..." : "Create Case"}
+          <button
+            type="submit"
+            className="submit-button"
+            disabled={loading}
+          >
+            {loading ? "Updating..." : "Update Case"}
           </button>
           <button
             type="button"
             className="cancel-button"
-            onClick={() => navigate("/lawyer-dashboard")}
+            onClick={() => navigate(`/case-details/${caseId}`)}
           >
             Cancel
           </button>
@@ -289,4 +320,4 @@ const CaseForm = () => {
   );
 };
 
-export default CaseForm;
+export default EditCaseForm; 

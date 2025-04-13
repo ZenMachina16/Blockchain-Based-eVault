@@ -15,10 +15,10 @@ const express = require("express");
 const router = express.Router();
 const Case = require("../models/Case");
 const User = require("../models/User"); // Assuming you have a User model
-const auth = require("../middleware/auth"); // Assuming you have auth middleware
+const { authenticateToken } = require("../middleware/auth"); // Fix the import
 
 // Create a new case
-router.post("/create", auth, async (req, res) => {
+router.post("/create", authenticateToken, async (req, res) => {
   try {
     const { 
       clientName, 
@@ -75,7 +75,7 @@ router.post("/create", auth, async (req, res) => {
 });
 
 // Get all cases for a lawyer
-router.get("/lawyer", auth, async (req, res) => {
+router.get("/lawyer", authenticateToken, async (req, res) => {
   try {
     console.log("User role in route:", req.user.role); // Debug log
     if (req.user.role !== "lawyer") {
@@ -91,7 +91,7 @@ router.get("/lawyer", auth, async (req, res) => {
 });
 
 // Get all cases for a client
-router.get("/client", auth, async (req, res) => {
+router.get("/client", authenticateToken, async (req, res) => {
   try {
     // Ensure user is a client
     if (req.user.role !== "client") {
@@ -107,7 +107,8 @@ router.get("/client", auth, async (req, res) => {
 });
 
 // Get a specific case by ID
-router.get("/:id", auth, async (req, res) => {
+// Get a specific case by ID
+router.get("/:id", authenticateToken, async (req, res) => {
   try {
     const caseItem = await Case.findById(req.params.id);
     
@@ -115,9 +116,11 @@ router.get("/:id", auth, async (req, res) => {
       return res.status(404).json({ message: "Case not found" });
     }
 
-    // Check if user has access
-    const userIsLawyer = req.user.role === "lawyer";
-    const userIsClient = req.user.role === "client" && req.user.email === caseItem.clientEmail;
+    // Check if user has access: only the lawyer who created it, or the client on the case
+    const userIsLawyer = req.user.role === "lawyer" 
+      && caseItem.createdBy.toString() === req.user.id;
+    const userIsClient = req.user.role === "client" 
+      && req.user.email === caseItem.clientEmail;
     
     if (!(userIsLawyer || userIsClient)) {
       return res.status(403).json({ message: "Access denied" });
@@ -131,7 +134,7 @@ router.get("/:id", auth, async (req, res) => {
 });
 
 // Update a case
-router.put("/:id", auth, async (req, res) => {
+router.put("/:id", authenticateToken, async (req, res) => {
   try {
     // Only lawyers can update cases
     if (req.user.role !== "lawyer") {
@@ -163,7 +166,7 @@ router.put("/:id", auth, async (req, res) => {
 });
 
 // Delete a case
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     // Only lawyers can delete cases
     if (req.user.role !== "lawyer") {

@@ -72,6 +72,23 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Get current user information
+router.get("/current-user", authenticateToken, async (req, res) => {
+  try {
+    // The user information is already available in req.user from the authenticateToken middleware
+    const user = await User.findById(req.user.id).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching current user:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
 // In your backend user-routes.js
 router.get("/check-client/:email", authenticateToken, async (req, res) => {
   try {

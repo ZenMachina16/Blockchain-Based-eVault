@@ -11,7 +11,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ClientDashboard from "./components/ClientDashboard";
 import CaseForm from "./components/CaseManagementForm";
 import CaseDetails from "./components/CaseDetails";
-// import EditCaseForm from "./components/EditCaseForm";
+import EditCaseForm from "./components/EditCaseForm";
 
 function App() {
   return (
@@ -28,8 +28,8 @@ function App() {
           <Route path="/file-management" element={<FileManagement />} />
           <Route path="/fetch-file" element={<FetchFileComponent />} />
           <Route path="/cases/create" element={<CaseForm />} />
-          <Route path="/case/:caseId" element={<CaseDetails />} />
-          {/* <Route path="/edit-case/:caseId" element={<EditCaseForm />} /> */}
+          <Route path="/case-details/:caseId" element={<CaseDetails />} />
+          <Route path="/edit-case/:caseId" element={<EditCaseForm />} />
         </Routes>
       </Router>
     </AuthProvider>

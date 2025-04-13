@@ -15,21 +15,18 @@
 // }
 // console.log("User object in middleware:", req.user);
 // middleware/auth.js
-console.log("Token received:", token ? token.substring(0, 10) + "..." : "none");
-// After decoding:
-console.log("User from token:", decoded.user);
-// After fetching from DB:
-console.log("User from DB:", user);
-console.log("User role:", user.role);
 
-module.exports = { authenticateToken };
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
-
+  
+  console.log(
+    "Token received:",
+    token ? token.substring(0, 10) + "..." : "none"
+  );
   console.log(
     "Token received:",
     token ? token.substring(0, 10) + "..." : "none"

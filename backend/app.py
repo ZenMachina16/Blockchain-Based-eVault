@@ -141,5 +141,23 @@ def upload_pdf():
     # Send the generated PDF back to the client
     return send_file(generated_pdf, as_attachment=True, download_name="summary_report.pdf")
 
+# Endpoint to get current user information
+@app.route('/auth/current-user', methods=['GET'])
+def get_current_user():
+    # In a real application, this would verify the token and return the user info
+    # For now, we'll return a mock user for testing
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({'error': 'No token provided'}), 401
+    
+    # In a real app, you would verify the token here
+    # For now, we'll just return a mock user
+    return jsonify({
+        'id': '12345',
+        'email': 'lawyer@example.com',
+        'role': 'lawyer',
+        'name': 'John Doe'
+    })
+
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
