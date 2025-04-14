@@ -16,6 +16,7 @@ const LawyerDashboard = () => {
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [profileData, setProfileData] = useState(null);
 
   // For the dropdown menu
   const [anchorEl, setAnchorEl] = useState(null);
@@ -28,6 +29,33 @@ const LawyerDashboard = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  // Fetch lawyer profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const response = await axios.get(
+          "http://localhost:5000/api/lawyer/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setProfileData(response.data);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
 
   // Logout function used in dropdown
   const handleLogout = () => {
@@ -119,7 +147,7 @@ const LawyerDashboard = () => {
           {/* Welcome Message */}
           <div id="welcome">
             Welcome back,
-            <br /> Adv. Kapil Dhavale
+            <br /> {profileData?.name || "Adv. Kapil Dhavale"}
           </div>
 
           {/* Profile & Search Bar Container */}
@@ -127,9 +155,14 @@ const LawyerDashboard = () => {
             {/* Profile Avatar with Dropdown */}
             <div id="profile-logo" style={{ position: "relative" }}>
               <Avatar
-                alt="Profile"
-                src="/profile.jpg" // Replace with actual profile image URL
-                sx={{ width: 50, height: 50, cursor: "pointer" }}
+                alt={profileData?.name || "Profile"}
+                src={profileData?.profilePicture || "/default-avatar.png"}
+                sx={{ 
+                  width: 50, 
+                  height: 50, 
+                  cursor: "pointer",
+                  border: "2px solid #587392"
+                }}
                 onClick={handleAvatarClick}
               />
               <Menu
@@ -145,10 +178,39 @@ const LawyerDashboard = () => {
                   vertical: "top",
                   horizontal: "right",
                 }}
-                ModalProps={{ disableScrollLock: true }}
+                MenuListProps={{
+                  'aria-labelledby': 'profile-button',
+                }}
+                slotProps={{
+                  paper: {
+                    elevation: 0,
+                    sx: {
+                      overflow: 'visible',
+                      filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                      mt: 1.5,
+                      '& .MuiMenuItem-root': {
+                        padding: '10px 20px',
+                        fontSize: '0.9rem',
+                        '&:hover': {
+                          backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                        },
+                      },
+                    },
+                  },
+                }}
               >
-                <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-                <MenuItem onClick={handleMenuClose}>My Account</MenuItem>
+                <MenuItem onClick={() => {
+                  handleMenuClose();
+                  navigate('/lawyer-profile', { state: { mode: 'edit' } });
+                }}>
+                  Edit Profile
+                </MenuItem>
+                <MenuItem onClick={() => {
+                  handleMenuClose();
+                  navigate('/lawyer-profile', { state: { mode: 'view' } });
+                }}>
+                  View Profile
+                </MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </div>

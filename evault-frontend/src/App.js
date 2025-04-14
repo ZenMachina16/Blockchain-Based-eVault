@@ -12,6 +12,7 @@ import ClientDashboard from "./components/ClientDashboard";
 import CaseForm from "./components/CaseManagementForm";
 import CaseDetails from "./components/CaseDetails";
 import EditCaseForm from "./components/EditCaseForm";
+import LawyerProfile from "./components/LawyerProfile";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route path="/create-case" element={<CaseForm />} />
           <Route path="/case/:id" element={<CaseDetails />} />
           <Route path="/edit-case/:caseId" element={<EditCaseForm />} />
+          <Route path="/lawyer-profile" element={<LawyerProfile />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

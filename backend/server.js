@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const path = require("path");
+const fs = require("fs");
 dotenv.config();
 
 const app = express();
@@ -21,12 +23,30 @@ const uploadRoutes = require("./routes/upload");
 const filesRoutes = require("./routes/files");
 const caseRoutes = require("./routes/caseRoutes");
 const documentRoutes = require("./routes/documentRoutes");
+const lawyerProfileRoutes = require("./routes/lawyerProfileRoutes");
 
-app.use("/api", documentRoutes);
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// API routes
+app.use("/api/auth", authRoutes);
 app.use("/api/cases", caseRoutes);
-app.use("/auth", authRoutes);
+app.use("/api/documents", documentRoutes);
+app.use("/api/lawyer", lawyerProfileRoutes);
 app.use("/upload", uploadRoutes);
 app.use("/files", filesRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something broke!', error: err.message });
+});
 
 // Start the server
 const PORT = process.env.PORT || 5000;
