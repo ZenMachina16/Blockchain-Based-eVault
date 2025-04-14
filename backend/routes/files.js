@@ -1,6 +1,6 @@
 const express = require("express");
 const { ethers } = require("hardhat");
-const { authenticateToken } = require("../middleware/auth");
+const authenticateToken = require("../middleware/auth");
 const fileMetadata = require("../data/fileMetadata");
 
 const router = express.Router();

@@ -1,9 +1,9 @@
 const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
-const { uploadToPinata, storeHashInContract } = require("../../scripts/pinataIntegration");
+const { uploadToPinata, storeHashInContract } = require("../scripts/pinataIntegration");
 const { ethers } = require("hardhat");
-const { authenticateToken } = require("../middleware/auth");
+const authenticateToken = require("../middleware/auth");
 const FileMetadata = require("../models/FileMetadata");
 
 const router = express.Router();

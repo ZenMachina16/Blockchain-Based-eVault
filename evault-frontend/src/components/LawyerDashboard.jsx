@@ -102,12 +102,6 @@ const LawyerDashboard = () => {
           <li onClick={handleSummariserClick} style={{ cursor: "pointer" }}>
             Summariser
           </li>
-          <li
-            onClick={() => navigate("/files")}
-            style={{ cursor: "pointer" }}
-          >
-            Upload Documents
-          </li>
           <li onClick={handleCreateCaseClick} style={{ cursor: "pointer" }}>
             Create Case
           </li>

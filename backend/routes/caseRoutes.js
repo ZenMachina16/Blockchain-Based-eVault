@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const authenticateToken = require("../middleware/auth");
 const caseController = require("../controllers/caseController");
-const { authenticateToken } = require("../middleware/auth");
 
 // Create a new case (lawyers only)
 router.post("/create", authenticateToken, caseController.createCase);

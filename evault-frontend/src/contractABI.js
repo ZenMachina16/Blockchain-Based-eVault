@@ -1,5 +1,5 @@
 // Replace with your contract ABI
-const yourContractABI = [
+const contractABI = [
   {
     inputs: [],
     stateMutability: "nonpayable",
@@ -524,6 +524,6 @@ const yourContractABI = [
     stateMutability: "nonpayable",
     type: "function",
   },
-]; // Add your contract ABI here
+];
 
-export default yourContractABI;
+export default contractABI;

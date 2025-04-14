@@ -20,8 +20,10 @@ const authRoutes = require("./routes/auth-routes");
 const uploadRoutes = require("./routes/upload");
 const filesRoutes = require("./routes/files");
 const caseRoutes = require("./routes/caseRoutes");
-app.use("/api/cases", caseRoutes);
+const documentRoutes = require("./routes/documentRoutes");
 
+app.use("/api", documentRoutes);
+app.use("/api/cases", caseRoutes);
 app.use("/auth", authRoutes);
 app.use("/upload", uploadRoutes);
 app.use("/files", filesRoutes);

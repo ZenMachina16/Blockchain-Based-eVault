@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../models/User"); // Your updated Mongoose model
-const { authenticateToken } = require("../middleware/auth");
+const authenticateToken = require("../middleware/auth");
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
