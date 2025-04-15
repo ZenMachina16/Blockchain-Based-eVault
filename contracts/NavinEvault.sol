@@ -3,7 +3,7 @@
 
     contract NavinEvault {
         address public owner;
-        mapping(address => bool) private courtOfficials;
+        mapping(address => bool) private lawyers;
         mapping(address => bool) private clients;
 
         struct CaseFile {
@@ -16,7 +16,7 @@
             string judgeName;
             address[] linkedClients;
             uint256 timestamp;
-            address linkedCourtOfficial;
+            address linkedLawyer;
             uint256 version;
             string documentStatus;
             string documentType;
@@ -45,12 +45,12 @@
             string judgeName,
             uint256 timestamp,
             address[] linkedClients,
-            address linkedCourtOfficial
+            address linkedLawyer
         );
 
         event ClientLinked(uint256 indexed fileId, address client);
-        event CourtOfficialLinked(uint256 indexed fileId, address courtOfficial);
-        event CourtOfficialReplaced(uint256 indexed fileId, address newCourtOfficial);
+        event LawyerLinked(uint256 indexed fileId, address lawyer);
+        event LawyerReplaced(uint256 indexed fileId, address newLawyer);
         event DocumentUpdated(uint256 indexed fileId, string newIpfsHash, uint256 version);
         event DocumentVerified(uint256 indexed fileId, address verifier);
         event DocumentStatusChanged(uint256 indexed fileId, string newStatus);
@@ -62,13 +62,13 @@
             _;
         }
 
-        modifier onlyCourtOfficial() {
-            require(courtOfficials[msg.sender], "Only court officials can upload files");
+        modifier onlyLawyer() {
+            require(lawyers[msg.sender], "Only lawyers can upload files");
             _;
         }
 
         modifier onlyAuthorizedUploader() {
-            require(courtOfficials[msg.sender] || clients[msg.sender], "Only authorized users can upload files");
+            require(lawyers[msg.sender] || clients[msg.sender], "Only authorized users can upload files");
             _;
         }
 
@@ -76,13 +76,13 @@
             owner = msg.sender;
         }
 
-        // Register court officials and clients
-        function addCourtOfficial(address _official) public onlyOwner {
-            courtOfficials[_official] = true;
+        // Register lawyers and clients
+        function addLawyer(address _lawyer) public onlyOwner {
+            lawyers[_lawyer] = true;
         }
 
-        function removeCourtOfficial(address _official) public onlyOwner {
-            courtOfficials[_official] = false;
+        function removeLawyer(address _lawyer) public onlyOwner {
+            lawyers[_lawyer] = false;
         }
 
         function addClient(address _client) public onlyOwner {
@@ -93,104 +93,118 @@
             clients[_client] = false;
         }
 
-        function isCourtOfficial(address _official) public view returns (bool) {
-            return courtOfficials[_official];
+        function isLawyer(address _lawyer) public view returns (bool) {
+            return lawyers[_lawyer];
         }
 
         function isClient(address _client) public view returns (bool) {
             return clients[_client];
         }
 
-        // Allow authorized users (court officials or clients) to upload files
+        // Allow authorized users (lawyers or clients) to upload files
         function uploadFile(
-            string memory _ipfsHash,
-            string memory _title,
-            string memory _dateOfJudgment,
-            string memory _caseNumber,
-            string memory _category,
-            string memory _judgeName,
-            address[] memory _linkedClients,
-            string memory _documentType,
-            string memory _description
+            string memory ipfsHash,
+            string memory title,
+            string memory description,
+            string memory fileType,
+            string memory caseNumber,
+            string memory clientName,
+            string memory clientEmail,
+            string memory clientPhone,
+            string memory clientAddress,
+            string memory courtName,
+            string memory judgeName,
+            string memory filingDate,
+            string memory status
         ) public onlyAuthorizedUploader {
-            require(bytes(_ipfsHash).length > 0, "IPFS hash is required");
-            require(_linkedClients.length > 0, "At least one client must be linked");
-
+            require(bytes(ipfsHash).length > 0, "IPFS hash is required");
+            
             totalCaseFiles++;
-            address courtOfficial = courtOfficials[msg.sender] ? msg.sender : address(0);
+            address linkedLawyer = lawyers[msg.sender] ? msg.sender : address(0);
+            
+            // Create an empty array for linkedClients if none exist yet
+            address[] memory emptyClientArray = new address[](0);
             
             caseFiles[totalCaseFiles] = CaseFile({
                 uploader: msg.sender,
-                ipfsHash: _ipfsHash,
-                title: _title,
-                dateOfJudgment: _dateOfJudgment,
-                caseNumber: _caseNumber,
-                category: _category,
-                judgeName: _judgeName,
-                linkedClients: _linkedClients,
+                ipfsHash: ipfsHash,
+                title: title,
+                dateOfJudgment: filingDate,
+                caseNumber: caseNumber,
+                category: courtName,
+                judgeName: judgeName,
+                linkedClients: emptyClientArray,
                 timestamp: block.timestamp,
-                linkedCourtOfficial: courtOfficial,
+                linkedLawyer: linkedLawyer,
                 version: 1,
-                documentStatus: "active",
-                documentType: _documentType,
-                description: _description,
+                documentStatus: status,
+                documentType: fileType,
+                description: description,
                 isVerified: false,
                 verifiedBy: address(0),
                 lastModified: block.timestamp,
                 previousVersions: new string[](0)
             });
 
-            documentVersions[totalCaseFiles][1] = _ipfsHash;
+            documentVersions[totalCaseFiles][1] = ipfsHash;
             documentVersionCount[totalCaseFiles] = 1;
-
-            for (uint256 i = 0; i < _linkedClients.length; i++) {
-                linkedClientsMap[totalCaseFiles][_linkedClients[i]] = true;
-                documentPermissions[totalCaseFiles][_linkedClients[i]] = true;
-            }
 
             emit FileUploaded(
                 msg.sender,
                 totalCaseFiles,
-                _ipfsHash,
-                _title,
-                _dateOfJudgment,
-                _caseNumber,
-                _category,
-                _judgeName,
+                ipfsHash,
+                title,
+                filingDate,
+                caseNumber,
+                courtName,
+                judgeName,
                 block.timestamp,
-                _linkedClients,
-                courtOfficial
+                emptyClientArray,
+                linkedLawyer
             );
         }
 
         // Link clients
-        function linkClients(uint256 _fileId, address[] memory _clients) public onlyCourtOfficial {
+        function linkClients(uint256 _fileId, address[] memory _clients) public onlyLawyer {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
-            require(caseFiles[_fileId].linkedCourtOfficial == msg.sender, "You are not the linked court official for this case");
+            require(caseFiles[_fileId].linkedLawyer == msg.sender, "You are not the linked lawyer for this case");
 
             for (uint256 i = 0; i < _clients.length; i++) {
                 address client = _clients[i];
                 require(!linkedClientsMap[_fileId][client], "Client is already linked to this case");
                 linkedClientsMap[_fileId][client] = true; // Link client
-                caseFiles[_fileId].linkedClients.push(client); // Add to array for external visibility
+                
+                // Add to the clients array
+                address[] storage currentClients = caseFiles[_fileId].linkedClients;
+                // Create a new array with one more element
+                address[] memory newClients = new address[](currentClients.length + 1);
+                // Copy existing clients
+                for (uint256 j = 0; j < currentClients.length; j++) {
+                    newClients[j] = currentClients[j];
+                }
+                // Add the new client
+                newClients[currentClients.length] = client;
+                // Update the storage array
+                caseFiles[_fileId].linkedClients = newClients;
+                
                 emit ClientLinked(_fileId, client);
             }
         }
 
-        // Replace court official for the case
-        function replaceCourtOfficial(uint256 _fileId, address _newCourtOfficial) public {
+        // Replace lawyer for the case
+        function replaceLawyer(uint256 _fileId, address _newLawyer) public {
             require(
-                courtOfficials[msg.sender] || caseFiles[_fileId].linkedCourtOfficial == msg.sender,
-                "You are not authorized to replace the official"
+                lawyers[msg.sender] || caseFiles[_fileId].linkedLawyer == msg.sender,
+                "You are not authorized to replace the lawyer"
             );
-            require(courtOfficials[_newCourtOfficial], "New official must be registered");
+            require(lawyers[_newLawyer], "New lawyer must be registered");
 
-            caseFiles[_fileId].linkedCourtOfficial = _newCourtOfficial;
+            caseFiles[_fileId].linkedLawyer = _newLawyer;
 
-            emit CourtOfficialReplaced(_fileId, _newCourtOfficial);
+            emit LawyerReplaced(_fileId, _newLawyer);
         }
 
-        // Clients or court officials can get case file details
+        // Clients or lawyers can get case file details
         function getFile(uint256 _fileId) public view returns (
             address uploader,
             string memory ipfsHash,
@@ -201,7 +215,7 @@
             string memory judgeName,
             address[] memory linkedClients,
             uint256 timestamp,
-            address linkedCourtOfficial,
+            address linkedLawyer,
             uint256 version,
             string memory documentStatus,
             string memory documentType,
@@ -213,7 +227,7 @@
         ) {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(
-                courtOfficials[msg.sender] || 
+                lawyers[msg.sender] || 
                 linkedClientsMap[_fileId][msg.sender] || 
                 documentPermissions[_fileId][msg.sender],
                 "Access denied"
@@ -230,7 +244,7 @@
                 file.judgeName,
                 file.linkedClients,
                 file.timestamp,
-                file.linkedCourtOfficial,
+                file.linkedLawyer,
                 file.version,
                 file.documentStatus,
                 file.documentType,
@@ -282,7 +296,7 @@
         ) public {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(
-                courtOfficials[msg.sender] || caseFiles[_fileId].linkedCourtOfficial == msg.sender,
+                lawyers[msg.sender] || caseFiles[_fileId].linkedLawyer == msg.sender,
                 "Not authorized to update document"
             );
 
@@ -300,7 +314,7 @@
         }
 
         // New function to verify document
-        function verifyDocument(uint256 _fileId) public onlyCourtOfficial {
+        function verifyDocument(uint256 _fileId) public onlyLawyer {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             
             CaseFile storage file = caseFiles[_fileId];
@@ -314,7 +328,7 @@
         function changeDocumentStatus(uint256 _fileId, string memory _newStatus) public {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(
-                courtOfficials[msg.sender] || caseFiles[_fileId].linkedCourtOfficial == msg.sender,
+                lawyers[msg.sender] || caseFiles[_fileId].linkedLawyer == msg.sender,
                 "Not authorized to change status"
             );
 
@@ -329,7 +343,7 @@
         function grantDocumentPermission(uint256 _fileId, address _user) public {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(
-                courtOfficials[msg.sender] || caseFiles[_fileId].linkedCourtOfficial == msg.sender,
+                lawyers[msg.sender] || caseFiles[_fileId].linkedLawyer == msg.sender,
                 "Not authorized to grant permissions"
             );
 
@@ -341,7 +355,7 @@
         function revokeDocumentPermission(uint256 _fileId, address _user) public {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(
-                courtOfficials[msg.sender] || caseFiles[_fileId].linkedCourtOfficial == msg.sender,
+                lawyers[msg.sender] || caseFiles[_fileId].linkedLawyer == msg.sender,
                 "Not authorized to revoke permissions"
             );
 
@@ -353,7 +367,7 @@
         function getDocumentVersions(uint256 _fileId) public view returns (string[] memory) {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(
-                courtOfficials[msg.sender] || 
+                lawyers[msg.sender] || 
                 linkedClientsMap[_fileId][msg.sender] || 
                 documentPermissions[_fileId][msg.sender],
                 "Access denied"
@@ -367,5 +381,99 @@
             }
             
             return versions;
+        }
+
+        /**
+         * @dev Returns all document hashes stored in the contract
+         * @return Array of IPFS hashes
+         */
+        function getAllDocumentHashes() public view returns (string[] memory) {
+            // If there are no documents, return an empty array
+            if (totalCaseFiles == 0) {
+                string[] memory emptyHashes = new string[](0);
+                return emptyHashes;
+            }
+            
+            // Count non-empty hashes
+            uint256 nonEmptyCount = 0;
+            for (uint256 i = 1; i <= totalCaseFiles; i++) {
+                if (bytes(caseFiles[i].ipfsHash).length > 0) {
+                    nonEmptyCount++;
+                }
+            }
+
+            // If no non-empty hashes, return an empty array
+            if (nonEmptyCount == 0) {
+                string[] memory emptyHashes = new string[](0);
+                return emptyHashes;
+            }
+
+            // Create array with only non-empty hashes
+            string[] memory hashes = new string[](nonEmptyCount);
+            uint256 index = 0;
+            for (uint256 i = 1; i <= totalCaseFiles; i++) {
+                if (bytes(caseFiles[i].ipfsHash).length > 0) {
+                    hashes[index] = caseFiles[i].ipfsHash;
+                    index++;
+                }
+            }
+            return hashes;
+        }
+
+        /**
+         * @dev Returns metadata for a specific document hash
+         * @param hash The IPFS hash of the document
+         * @return title The document title
+         * @return description The document description
+         * @return fileType The document type
+         * @return date The document date
+         */
+        function getDocumentMetadata(string memory hash) public view returns (
+            string memory title,
+            string memory description,
+            string memory fileType,
+            string memory date
+        ) {
+            // Find the document with the given hash
+            for (uint256 i = 0; i < totalCaseFiles; i++) {
+                if (keccak256(bytes(caseFiles[i].ipfsHash)) == keccak256(bytes(hash))) {
+                    return (
+                        caseFiles[i].title,
+                        caseFiles[i].description,
+                        caseFiles[i].documentType,
+                        caseFiles[i].dateOfJudgment
+                    );
+                }
+            }
+            
+            // If not found, return empty strings
+            return ("", "", "", "");
+        }
+
+        /**
+         * @dev Deletes a document from the contract
+         * @param documentId The IPFS hash of the document to delete
+         */
+        function deleteDocument(string memory documentId) public {
+            // Find the document with the given hash
+            for (uint256 i = 0; i < totalCaseFiles; i++) {
+                if (keccak256(bytes(caseFiles[i].ipfsHash)) == keccak256(bytes(documentId))) {
+                    // Only allow deletion by the uploader or the owner
+                    require(
+                        msg.sender == caseFiles[i].uploader || msg.sender == owner,
+                        "Only the uploader or owner can delete this document"
+                    );
+                    
+                    // Mark as deleted by setting the hash to empty
+                    caseFiles[i].ipfsHash = "";
+                    caseFiles[i].documentStatus = "DELETED";
+                    caseFiles[i].lastModified = block.timestamp;
+                    
+                    return;
+                }
+            }
+            
+            // If not found, revert
+            revert("Document not found");
         }
     }

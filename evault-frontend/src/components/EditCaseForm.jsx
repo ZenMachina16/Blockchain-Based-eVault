@@ -86,15 +86,10 @@ const EditCaseForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
-
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Authentication required");
-        setLoading(false);
         navigate("/login");
         return;
       }
@@ -105,20 +100,15 @@ const EditCaseForm = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
         }
       );
 
       setSuccess(true);
-      setLoading(false);
-      
-      // Redirect to case details page after successful update
       setTimeout(() => {
-        navigate(`/case-details/${caseId}`);
+        navigate(`/case/${caseId}`);
       }, 2000);
     } catch (err) {
-      setLoading(false);
       if (err.response) {
         setError(err.response.data.message || "Failed to update case");
       } else {

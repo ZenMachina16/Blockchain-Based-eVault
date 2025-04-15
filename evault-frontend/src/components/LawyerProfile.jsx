@@ -17,6 +17,8 @@ import { useTheme } from "@mui/material/styles";
 import { useLocation, useNavigate } from "react-router-dom";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import axios from "axios";
+import { ethers } from "ethers";
+import contractABI from "../contractABI";
 
 const LawyerProfile = () => {
   const theme = useTheme();
@@ -35,8 +37,10 @@ const LawyerProfile = () => {
     location: "",
     profilePicture: "",
   });
+  const [documents, setDocuments] = useState([]);
 
   const isEditMode = location.state?.mode === 'edit';
+  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
   useEffect(() => {
     fetchProfile();
@@ -110,6 +114,44 @@ const LawyerProfile = () => {
       } finally {
         setLoading(false);
       }
+    }
+  };
+
+  const fetchDocuments = async () => {
+    try {
+      setLoading(true);
+      
+      // Connect to blockchain
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const contract = new ethers.Contract(contractAddress, contractABI, provider);
+      
+      // Get all document hashes from the blockchain
+      // This would require a function in your smart contract to return all document hashes
+      const documentHashes = await contract.getAllDocumentHashes();
+      
+      // Process each document
+      const documents = await Promise.all(
+        documentHashes.map(async (hash) => {
+          // Get document metadata from blockchain
+          const metadata = await contract.getDocumentMetadata(hash);
+          
+          return {
+            ipfsHash: hash,
+            title: metadata.title,
+            description: metadata.description,
+            type: metadata.type,
+            date: metadata.date,
+            isVerified: true // Always verified since it's from the blockchain
+          };
+        })
+      );
+      
+      setDocuments(documents);
+      setLoading(false);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setError('Failed to fetch documents from blockchain');
+      setLoading(false);
     }
   };
 

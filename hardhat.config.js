@@ -4,6 +4,10 @@ require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 
+// Check if environment variables are defined
+const SEPOLIA_URL = process.env.SEPOLIA_URL || "https://eth-sepolia.g.alchemy.com/v2/your-api-key";
+const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000000";
+
 module.exports = {
   solidity: {
     version: "0.8.24", // Or your specific version
@@ -17,8 +21,8 @@ module.exports = {
   },
   networks: {
     sepolia: {
-      url: process.env.SEPOLIA_URL, // Your Alchemy or Infura URL
-      accounts: [process.env.PRIVATE_KEY], // Your wallet's private key
+      url: SEPOLIA_URL,
+      accounts: [PRIVATE_KEY],
       // No need to specify gas or gasLimit; it will be auto-estimated
     },
     localhost: {
@@ -29,8 +33,8 @@ module.exports = {
   ignition: {
     networks: {
       sepolia: {
-        url: process.env.SEPOLIA_URL, // Your Alchemy or Infura URL
-        accounts: [process.env.PRIVATE_KEY], // Your wallet's private key
+        url: SEPOLIA_URL,
+        accounts: [PRIVATE_KEY],
       },
       localhost: {
         url: "http://127.0.0.1:8545",

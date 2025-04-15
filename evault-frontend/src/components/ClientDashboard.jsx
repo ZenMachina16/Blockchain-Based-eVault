@@ -65,6 +65,10 @@ const ClientDashboard = () => {
     }
   };
 
+  const handleCaseClick = (caseId) => {
+    navigate(`/case/${caseId}`);
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
@@ -89,20 +93,7 @@ const ClientDashboard = () => {
         <Typography variant="h4" component="h1" fontWeight="bold">
           My Cases
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/cases/new')}
-          sx={{
-            borderRadius: 2,
-            textTransform: 'none',
-            px: 3,
-            py: 1,
-            boxShadow: 3,
-          }}
-        >
-          New Case
-        </Button>
+       
       </Box>
 
       {cases.length === 0 ? (
@@ -158,7 +149,7 @@ const ClientDashboard = () => {
                     <Button
                       variant="outlined"
                       startIcon={<DescriptionIcon />}
-                      onClick={() => navigate(`/case/${caseItem._id}`)}
+                      onClick={() => handleCaseClick(caseItem._id)}
                       fullWidth
                       sx={{
                         borderRadius: 2,

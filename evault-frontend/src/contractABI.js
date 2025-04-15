@@ -1,529 +1,944 @@
-// Replace with your contract ABI
+// Auto-generated from the latest contract
 const contractABI = [
   {
-    inputs: [],
-    stateMutability: "nonpayable",
-    type: "constructor",
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "fileId",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fileId",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        internalType: "address",
-        name: "client",
-        type: "address",
-      },
+        "indexed": false,
+        "internalType": "address",
+        "name": "client",
+        "type": "address"
+      }
     ],
-    name: "ClientLinked",
-    type: "event",
+    "name": "ClientLinked",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "fileId",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fileId",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        internalType: "address",
-        name: "courtOfficial",
-        type: "address",
-      },
+        "indexed": false,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
     ],
-    name: "CourtOfficialLinked",
-    type: "event",
+    "name": "DocumentPermissionGranted",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "fileId",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fileId",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        internalType: "address",
-        name: "newCourtOfficial",
-        type: "address",
-      },
+        "indexed": false,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
     ],
-    name: "CourtOfficialReplaced",
-    type: "event",
+    "name": "DocumentPermissionRevoked",
+    "type": "event"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        internalType: "address",
-        name: "uploader",
-        type: "address",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fileId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "fileId",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "ipfsHash",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "title",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "dateOfJudgment",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "caseNumber",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "category",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "string",
-        name: "judgeName",
-        type: "string",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "timestamp",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "address[]",
-        name: "linkedClients",
-        type: "address[]",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "linkedCourtOfficial",
-        type: "address",
-      },
+        "indexed": false,
+        "internalType": "string",
+        "name": "newStatus",
+        "type": "string"
+      }
     ],
-    name: "FileUploaded",
-    type: "event",
+    "name": "DocumentStatusChanged",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: "address",
-        name: "_client",
-        type: "address",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fileId",
+        "type": "uint256"
       },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "newIpfsHash",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "version",
+        "type": "uint256"
+      }
     ],
-    name: "addClient",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "DocumentUpdated",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: "address",
-        name: "_official",
-        type: "address",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fileId",
+        "type": "uint256"
       },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "verifier",
+        "type": "address"
+      }
     ],
-    name: "addCourtOfficial",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "DocumentVerified",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "address",
+        "name": "uploader",
+        "type": "address"
       },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fileId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "dateOfJudgment",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "caseNumber",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "judgeName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "linkedClients",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "linkedLawyer",
+        "type": "address"
+      }
     ],
-    name: "caseFiles",
-    outputs: [
-      {
-        internalType: "address",
-        name: "uploader",
-        type: "address",
-      },
-      {
-        internalType: "string",
-        name: "ipfsHash",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "title",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "dateOfJudgment",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "caseNumber",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "category",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "judgeName",
-        type: "string",
-      },
-      {
-        internalType: "uint256",
-        name: "timestamp",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "linkedCourtOfficial",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    "name": "FileUploaded",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_fileId",
-        type: "uint256",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fileId",
+        "type": "uint256"
       },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "lawyer",
+        "type": "address"
+      }
     ],
-    name: "getFile",
-    outputs: [
-      {
-        internalType: "address",
-        name: "uploader",
-        type: "address",
-      },
-      {
-        internalType: "string",
-        name: "ipfsHash",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "title",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "dateOfJudgment",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "caseNumber",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "category",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "judgeName",
-        type: "string",
-      },
-      {
-        internalType: "address[]",
-        name: "linkedClients",
-        type: "address[]",
-      },
-      {
-        internalType: "uint256",
-        name: "timestamp",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "linkedCourtOfficial",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    "name": "LawyerLinked",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: "address",
-        name: "_client",
-        type: "address",
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "fileId",
+        "type": "uint256"
       },
-    ],
-    name: "isClient",
-    outputs: [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
+        "indexed": false,
+        "internalType": "address",
+        "name": "newLawyer",
+        "type": "address"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "name": "LawyerReplaced",
+    "type": "event"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "address",
-        name: "_official",
-        type: "address",
-      },
+        "internalType": "address",
+        "name": "_client",
+        "type": "address"
+      }
     ],
-    name: "isCourtOfficial",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
+    "name": "addClient",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "uint256",
-        name: "_fileId",
-        type: "uint256",
-      },
-      {
-        internalType: "address[]",
-        name: "_clients",
-        type: "address[]",
-      },
+        "internalType": "address",
+        "name": "_lawyer",
+        "type": "address"
+      }
     ],
-    name: "linkClients",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "addLawyer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: "owner",
-    outputs: [
+    "inputs": [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "name": "caseFiles",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "uploader",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "dateOfJudgment",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "caseNumber",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "judgeName",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "linkedLawyer",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "version",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "documentStatus",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "documentType",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "isVerified",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "verifiedBy",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastModified",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "address",
-        name: "_client",
-        type: "address",
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
       },
+      {
+        "internalType": "string",
+        "name": "_newStatus",
+        "type": "string"
+      }
     ],
-    name: "removeClient",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "changeDocumentStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "address",
-        name: "_official",
-        type: "address",
-      },
+        "internalType": "string",
+        "name": "documentId",
+        "type": "string"
+      }
     ],
-    name: "removeCourtOfficial",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "deleteDocument",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [],
+    "name": "getAllDocumentHashes",
+    "outputs": [
       {
-        internalType: "uint256",
-        name: "_fileId",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "_newCourtOfficial",
-        type: "address",
-      },
+        "internalType": "string[]",
+        "name": "",
+        "type": "string[]"
+      }
     ],
-    name: "replaceCourtOfficial",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "string",
-        name: "_title",
-        type: "string",
-      },
+        "internalType": "string",
+        "name": "hash",
+        "type": "string"
+      }
     ],
-    name: "searchByTitle",
-    outputs: [
+    "name": "getDocumentMetadata",
+    "outputs": [
       {
-        components: [
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "fileType",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "date",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getDocumentVersions",
+    "outputs": [
+      {
+        "internalType": "string[]",
+        "name": "",
+        "type": "string[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getFile",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "uploader",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "dateOfJudgment",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "caseNumber",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "judgeName",
+        "type": "string"
+      },
+      {
+        "internalType": "address[]",
+        "name": "linkedClients",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "linkedLawyer",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "version",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "documentStatus",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "documentType",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "isVerified",
+        "type": "bool"
+      },
+      {
+        "internalType": "address",
+        "name": "verifiedBy",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lastModified",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string[]",
+        "name": "previousVersions",
+        "type": "string[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "grantDocumentPermission",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_client",
+        "type": "address"
+      }
+    ],
+    "name": "isClient",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_lawyer",
+        "type": "address"
+      }
+    ],
+    "name": "isLawyer",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_clients",
+        "type": "address[]"
+      }
+    ],
+    "name": "linkClients",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_client",
+        "type": "address"
+      }
+    ],
+    "name": "removeClient",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_lawyer",
+        "type": "address"
+      }
+    ],
+    "name": "removeLawyer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_newLawyer",
+        "type": "address"
+      }
+    ],
+    "name": "replaceLawyer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "revokeDocumentPermission",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_title",
+        "type": "string"
+      }
+    ],
+    "name": "searchByTitle",
+    "outputs": [
+      {
+        "components": [
           {
-            internalType: "address",
-            name: "uploader",
-            type: "address",
+            "internalType": "address",
+            "name": "uploader",
+            "type": "address"
           },
           {
-            internalType: "string",
-            name: "ipfsHash",
-            type: "string",
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
           },
           {
-            internalType: "string",
-            name: "title",
-            type: "string",
+            "internalType": "string",
+            "name": "title",
+            "type": "string"
           },
           {
-            internalType: "string",
-            name: "dateOfJudgment",
-            type: "string",
+            "internalType": "string",
+            "name": "dateOfJudgment",
+            "type": "string"
           },
           {
-            internalType: "string",
-            name: "caseNumber",
-            type: "string",
+            "internalType": "string",
+            "name": "caseNumber",
+            "type": "string"
           },
           {
-            internalType: "string",
-            name: "category",
-            type: "string",
+            "internalType": "string",
+            "name": "category",
+            "type": "string"
           },
           {
-            internalType: "string",
-            name: "judgeName",
-            type: "string",
+            "internalType": "string",
+            "name": "judgeName",
+            "type": "string"
           },
           {
-            internalType: "address[]",
-            name: "linkedClients",
-            type: "address[]",
+            "internalType": "address[]",
+            "name": "linkedClients",
+            "type": "address[]"
           },
           {
-            internalType: "uint256",
-            name: "timestamp",
-            type: "uint256",
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
           },
           {
-            internalType: "address",
-            name: "linkedCourtOfficial",
-            type: "address",
+            "internalType": "address",
+            "name": "linkedLawyer",
+            "type": "address"
           },
+          {
+            "internalType": "uint256",
+            "name": "version",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "documentStatus",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "documentType",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "internalType": "bool",
+            "name": "isVerified",
+            "type": "bool"
+          },
+          {
+            "internalType": "address",
+            "name": "verifiedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "lastModified",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string[]",
+            "name": "previousVersions",
+            "type": "string[]"
+          }
         ],
-        internalType: "struct NavinEvault.CaseFile[]",
-        name: "",
-        type: "tuple[]",
-      },
+        "internalType": "struct NavinEvault.CaseFile[]",
+        "name": "",
+        "type": "tuple[]"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: "totalCaseFiles",
-    outputs: [
+    "inputs": [],
+    "name": "totalCaseFiles",
+    "outputs": [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    stateMutability: "view",
-    type: "function",
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: "string",
-        name: "_ipfsHash",
-        type: "string",
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
       },
       {
-        internalType: "string",
-        name: "_title",
-        type: "string",
+        "internalType": "string",
+        "name": "_newIpfsHash",
+        "type": "string"
       },
       {
-        internalType: "string",
-        name: "_dateOfJudgment",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "_caseNumber",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "_category",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "_judgeName",
-        type: "string",
-      },
-      {
-        internalType: "address[]",
-        name: "_linkedClients",
-        type: "address[]",
-      },
+        "internalType": "string",
+        "name": "_description",
+        "type": "string"
+      }
     ],
-    name: "uploadFile",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    "name": "updateDocument",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "ipfsHash",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "fileType",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "caseNumber",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "clientName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "clientEmail",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "clientPhone",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "clientAddress",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "courtName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "judgeName",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "filingDate",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "status",
+        "type": "string"
+      }
+    ],
+    "name": "uploadFile",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fileId",
+        "type": "uint256"
+      }
+    ],
+    "name": "verifyDocument",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
 ];
 
 export default contractABI;

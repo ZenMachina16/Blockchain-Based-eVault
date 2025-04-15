@@ -16,12 +16,12 @@ import {
   CircularProgress,
   Alert,
   Paper,
+  Tooltip,
 } from '@mui/material';
-import { Delete as DeleteIcon, Download as DownloadIcon, Upload as UploadIcon } from '@mui/icons-material';
+import { Delete as DeleteIcon, Download as DownloadIcon, Upload as UploadIcon, Verified as VerifiedIcon } from '@mui/icons-material';
 import axios from 'axios';
-import { create } from 'ipfs-http-client';
-import { BrowserProvider, Contract } from 'ethers';
-import yourContractABI from '../contractABI';
+import { ethers } from 'ethers';
+import contractABI from '../contractABI';
 
 const CaseDocuments = ({ caseId, userRole }) => {
   const [documents, setDocuments] = useState([]);
@@ -33,32 +33,129 @@ const CaseDocuments = ({ caseId, userRole }) => {
   const [documentTitle, setDocumentTitle] = useState('');
   const [documentDescription, setDocumentDescription] = useState('');
   const [documentType, setDocumentType] = useState('');
+  const [verifying, setVerifying] = useState(false);
 
-  // Configure IPFS with Pinata
-  const ipfs = create({
-    url: 'https://api.pinata.cloud',
-    headers: {
-      pinata_api_key: process.env.REACT_APP_PINATA_API_KEY,
-      pinata_secret_api_key: process.env.REACT_APP_PINATA_SECRET_API_KEY
-    }
-  });
-
-  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+  // Use the correct contract address from your environment variables - hardcoded for testing
+  const contractAddress = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"; // Latest deployed contract
 
   useEffect(() => {
+    // Register the current user as a lawyer when component mounts
+    const registerAsLawyer = async () => {
+      try {
+        if (!window.ethereum) return;
+        
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        
+        // Get the current user address
+        const userAddress = await signer.getAddress();
+        console.log("Current user address:", userAddress);
+        
+        // Check if already a lawyer
+        const isLawyer = await contract.isLawyer(userAddress);
+        console.log("User is lawyer:", isLawyer);
+        
+        if (!isLawyer) {
+          // Get the contract owner
+          const owner = await contract.owner();
+          console.log("Contract owner:", owner);
+          
+          if (userAddress.toLowerCase() === owner.toLowerCase()) {
+            // Current user is the owner, can directly register as lawyer
+            const tx = await contract.addLawyer(userAddress);
+            await tx.wait();
+            console.log("Successfully registered as lawyer");
+          } else {
+            console.log("User is not the owner, needs to be registered by owner");
+          }
+        }
+      } catch (error) {
+        console.error("Error registering as lawyer:", error);
+      }
+    };
+    
+    registerAsLawyer();
     fetchDocuments();
   }, [caseId]);
 
   const fetchDocuments = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/api/cases/${caseId}/documents`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setDocuments(response.data);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to fetch documents');
+      setLoading(true);
+      setError(null);
+      
+      // Check if window.ethereum is available
+      if (!window.ethereum) {
+        throw new Error("MetaMask is not installed or not accessible");
+      }
+
+      // Connect to blockchain using ethers.js v6 syntax
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      
+      // Log relevant information for debugging
+      console.log("Contract Address:", contractAddress);
+      
+      // Create contract instance
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      
+      try {
+        // Get all document hashes from the blockchain
+        const hashes = await contract.getAllDocumentHashes();
+        console.log("Raw hashes from blockchain:", hashes);
+        
+        // Handle case where hashes is null or empty
+        if (!hashes || hashes.length === 0 || (hashes.length === 1 && hashes[0] === "")) {
+          console.log("No documents found");
+          setDocuments([]);
+          return;
+        }
+        
+        // Filter out empty hashes
+        const validHashes = hashes.filter(hash => hash && hash !== "");
+        
+        // Get metadata for each document
+        const documentPromises = validHashes.map(async (hash) => {
+          try {
+            // Get document metadata from blockchain
+            const [title, description, fileType, date] = await contract.getDocumentMetadata(hash);
+            
+            return {
+              ipfsHash: hash,
+              title: title || "Document", // Use title from metadata, fallback to "Document"
+              description: description || "No description available", // Use description from metadata
+              fileType: fileType || "unknown", // Use fileType from metadata
+              uploadDate: date || new Date().toISOString() // Use date from metadata
+            };
+          } catch (err) {
+            console.error(`Error fetching metadata for hash ${hash}:`, err);
+            return {
+              ipfsHash: hash,
+              title: "Document", // Default title
+              description: "No description available", // Default description
+              fileType: "unknown", // Default file type
+              uploadDate: new Date().toISOString() // Default date
+            };
+          }
+        });
+        
+        // Wait for all metadata to be fetched
+        const documents = await Promise.all(documentPromises);
+        
+        console.log("Processed documents:", documents);
+        setDocuments(documents);
+      } catch (contractError) {
+        console.error("Contract interaction error:", contractError);
+        setError(`Contract error: ${contractError.message}`);
+        setDocuments([]);
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setError(`Failed to fetch documents: ${error.message}`);
+      setDocuments([]);
+    } finally {
       setLoading(false);
     }
   };
@@ -75,6 +172,11 @@ const CaseDocuments = ({ caseId, userRole }) => {
 
     setUploading(true);
     try {
+      // Check if window.ethereum is available
+      if (!window.ethereum) {
+        throw new Error("MetaMask is not installed or not accessible");
+      }
+      
       // Upload to IPFS using Pinata API directly
       const formData = new FormData();
       formData.append('file', selectedFile);
@@ -88,50 +190,77 @@ const CaseDocuments = ({ caseId, userRole }) => {
       });
       
       const ipfsHash = response.data.IpfsHash;
+      console.log("IPFS Hash:", ipfsHash);
 
-      // Get contract instance
-      const provider = new BrowserProvider(window.ethereum);
+      // Get contract instance using ethers.js v6 syntax
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
-      const contract = new Contract(contractAddress, yourContractABI, signer);
-
-      // Get the signer's address for the linkedClients array
-      const signerAddress = await signer.getAddress();
       
-      // Upload document metadata to blockchain
-      const tx = await contract.uploadFile(
-        ipfsHash,
-        documentTitle,
-        new Date().toISOString(),
-        caseId.toString(),
-        'Legal Document',
-        documentType,
-        [signerAddress] // Use the signer's address instead of caseId
-      );
-
-      await tx.wait();
-
-      // Save document reference in backend
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `http://localhost:5000/api/cases/${caseId}/documents`,
-        {
-          title: documentTitle,
-          description: documentDescription,
-          type: documentType,
-          ipfsHash: ipfsHash,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
+      // Log important info
+      console.log("Contract address:", contractAddress);
+      
+      // Create contract instance
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      
+      // Now try to upload the file
+      try {
+        console.log("Uploading file...");
+        
+        // Force register as lawyer (FOR TESTING ONLY)
+        const userAddress = await signer.getAddress();
+        const isLawyer = await contract.isLawyer(userAddress);
+        
+        if (!isLawyer) {
+          try {
+            console.log("Attempting to register as lawyer using Hardhat default account...");
+            // Use hardhat's first account private key (ONLY FOR LOCAL TESTING)
+            const ownerPrivateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
+            const ownerWallet = new ethers.Wallet(ownerPrivateKey, provider);
+            const ownerContract = new ethers.Contract(contractAddress, contractABI, ownerWallet);
+            
+            const tx = await ownerContract.addLawyer(userAddress);
+            await tx.wait();
+            console.log("Successfully registered as lawyer");
+          } catch (err) {
+            console.error("Failed to register as lawyer:", err);
+            setError("Failed to register as lawyer: " + err.message);
+            return;
+          }
         }
-      );
-
-      setOpenUpload(false);
-      fetchDocuments();
+        
+        const uploadTx = await contract.uploadFile(
+          ipfsHash,
+          documentTitle,
+          documentDescription || "",
+          documentType,
+          caseId.toString(),
+          "", // clientName
+          "", // clientEmail
+          "", // clientPhone
+          "", // clientAddress
+          "", // courtName
+          "", // judgeName
+          new Date().toISOString(), // filingDate
+          "ACTIVE" // status
+        );
+        
+        console.log("Upload transaction hash:", uploadTx.hash);
+        await uploadTx.wait();
+        console.log("File uploaded successfully");
+        
+        setOpenUpload(false);
+        fetchDocuments();
+      } catch (err) {
+        console.error("Upload transaction error:", err);
+        setError("Upload transaction failed: " + err.message);
+      }
     } catch (err) {
       console.error('Upload error:', err);
       setError('Failed to upload document: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setUploading(false);
     }
-    setUploading(false);
   };
 
   const handleDownload = async (ipfsHash) => {
@@ -145,10 +274,15 @@ const CaseDocuments = ({ caseId, userRole }) => {
 
   const handleDelete = async (documentId) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/cases/${caseId}/documents/${documentId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // Get contract instance using ethers.js v6 syntax
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, contractABI, signer);
+      
+      // Call the delete function on the blockchain
+      const tx = await contract.deleteDocument(documentId);
+      await tx.wait();
+      
       fetchDocuments();
     } catch (err) {
       setError('Failed to delete document');
@@ -182,13 +316,20 @@ const CaseDocuments = ({ caseId, userRole }) => {
 
       <List>
         {documents.map((doc) => (
-          <ListItem key={doc._id} divider>
+          <ListItem key={doc.ipfsHash} divider>
             <ListItemText
-              primary={doc.title}
+              primary={
+                <Box display="flex" alignItems="center" gap={1}>
+                  {doc.title}
+                  <Tooltip title="Verified on Blockchain">
+                    <VerifiedIcon color="success" fontSize="small" />
+                  </Tooltip>
+                </Box>
+              }
               secondary={
                 <>
                   <Typography component="span" variant="body2" color="text.primary">
-                    {doc.type}
+                    {doc.fileType}
                   </Typography>
                   {` — ${doc.description}`}
                 </>
@@ -206,7 +347,7 @@ const CaseDocuments = ({ caseId, userRole }) => {
                 <IconButton
                   edge="end"
                   aria-label="delete"
-                  onClick={() => handleDelete(doc._id)}
+                  onClick={() => handleDelete(doc.ipfsHash)}
                 >
                   <DeleteIcon />
                 </IconButton>

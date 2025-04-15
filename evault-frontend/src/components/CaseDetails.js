@@ -43,7 +43,7 @@ const CaseDetails = () => {
         }
 
         // Get user info
-        const userResponse = await axios.get("http://localhost:5000/auth/current-user", {
+        const userResponse = await axios.get("http://localhost:5000/api/auth/current-user", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

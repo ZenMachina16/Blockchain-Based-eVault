@@ -9,7 +9,6 @@ const fileMetadataSchema = new mongoose.Schema({
   category: { type: String },
   judgeName: { type: String },
   linkedClients: { type: [String] },
-  ipfsHash: { type: String, required: true },
   uploader: { type: String },
   timestamp: { type: Date, default: Date.now },
 });
