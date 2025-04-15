@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CSS/Register.css"; 
+
 const Register = () => {
   const [formData, setFormData] = useState({
+    name: "",       // Added name field
     email: "",
     password: "",
     role: "",
-    wallet: "", // Wallet field for MetaMask users
+    wallet: "",     // Wallet field for MetaMask users
   });
+
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -23,7 +26,7 @@ const Register = () => {
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
         });
-        setFormData({ ...formData, wallet: accounts[0] }); // Fill wallet field
+        setFormData({ ...formData, wallet: accounts[0] });
       } catch (error) {
         setMessage("MetaMask connection failed. Please try again.");
       }
@@ -64,8 +67,16 @@ const Register = () => {
           <h2>Register</h2>
         </div>
         {message && <p className="register-message">{message}</p>}
-      
+
         <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Enter your full name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+          />
           <input
             type="email"
             name="email"

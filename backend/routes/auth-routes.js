@@ -2,36 +2,40 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const router = express.Router();
-const User = require("../models/User"); // Your updated Mongoose model
+const User = require("../models/User");
 const authenticateToken = require("../middleware/auth");
 
 const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-// Register endpoint
+// ============================
+// @route   POST /api/auth/register
+// @desc    Register a new user
+// ============================
 router.post("/register", async (req, res) => {
   try {
-    // Extract wallet as an optional field
-    const { email, password, role, wallet } = req.body;
-    if (!email || !password || !role) {
-      return res
-        .status(400)
-        .json({ message: "Email, password, and role are required." });
+    const { name, email, password, role, wallet } = req.body;
+
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({
+        message: "Name, email, password, and role are required.",
+      });
     }
 
-    // Check if user already exists in the DB
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists." });
     }
 
-    // Hash the password and create a new user document
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = new User({
+      name,
       email,
       password: hashedPassword,
       role,
-      wallet: wallet || undefined, // wallet is optional
+      wallet: wallet || undefined,
     });
+
     const savedUser = await newUser.save();
 
     console.log(`User registered: ${savedUser.email}`);
@@ -42,69 +46,75 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Login endpoint remains unchanged
+// ============================
+// @route   POST /api/auth/login
+// @desc    Login and return JWT
+// ============================
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    // Find user in the DB
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials." });
     }
 
-    // Compare the provided password with the stored hash
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials." });
     }
 
-    console.log(`User logged in: ${email}`);
-    // Sign and return a JWT token
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: "1h" },
+      { expiresIn: "1h" }
     );
+
+    console.log(`User logged in: ${user.email}`);
     res.json({ token });
   } catch (error) {
-    console.error("Error during login:", error);
+    console.error("Login error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-// Get current user information
+// ============================
+// @route   GET /api/auth/current-user
+// @desc    Get current logged-in user's data
+// ============================
 router.get("/current-user", authenticateToken, async (req, res) => {
   try {
-    // The user information is already available in req.user from the authenticateToken middleware
-    const user = await User.findById(req.user.id).select('-password');
-    
+    const user = await User.findById(req.user.id).select("-password");
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     res.json(user);
   } catch (error) {
-    console.error("Error fetching current user:", error);
+    console.error("Fetch current-user error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-// In your backend user-routes.js
+// ============================
+// @route   GET /api/auth/check-client/:email
+// @desc    Check if email exists and belongs to a client
+// ============================
 router.get("/check-client/:email", authenticateToken, async (req, res) => {
   try {
-    const client = await User.findOne({ 
+    const client = await User.findOne({
       email: req.params.email,
-      role: "client" 
+      role: "client",
     });
-    
+
     if (!client) {
       return res.status(404).json({ message: "Client not found" });
     }
-    
-    // Client exists
+
     res.status(200).json({ message: "Client found" });
   } catch (error) {
-    console.error("Error checking client:", error);
+    console.error("Check client error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
