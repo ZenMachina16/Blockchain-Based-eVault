@@ -1,10 +1,23 @@
+* Basic resets / font style */ * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
+  background-color: white;
+}
+
+
+
+
+
 .case-form-container {
-  max-width: 1000px;
-  margin: 2rem auto;
+  width: 100%;
+  height: 100%;
+  /* margin: 2rem auto; */
   padding: 2rem;
-  background-color: #fff;
+  /* background-color: #fc9292; */
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
 }
 
 .case-form-container h2 {
@@ -17,29 +30,32 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  background: linear-gradient(-90deg, #7D8CFF, #C3CAFF, #d5daf8);
 }
 
-.form-section {
-  background-color: #f9f9f9;
+.form-section-case {
   padding: 1.5rem;
   border-radius: 6px;
-  border: 1px solid #eaeaea;
+  border: 1px solid #030303;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
 }
 
-.form-section h3 {
+.form-section-case h3 {
+  grid-column: span 2;
   color: #444;
   margin-bottom: 1rem;
   font-size: 1.2rem;
-  border-bottom: 1px solid #ddd;
   padding-bottom: 0.5rem;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group label {
-  display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
   color: #555;
@@ -144,13 +160,17 @@
     margin: 1rem;
     padding: 1rem;
   }
-  
+
+  .form-section-case {
+    grid-template-columns: 1fr;
+  }
+
   .form-actions {
     flex-direction: column;
   }
-  
+
   .submit-button,
   .cancel-button {
     width: 100%;
   }
-} 
+}

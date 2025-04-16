@@ -1,46 +1,34 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  TextField,
-  Button,
-  Avatar,
-  Paper,
-  Grid,
-  CircularProgress,
-  Alert,
-  IconButton,
-  Divider,
-} from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import { useLocation, useNavigate } from "react-router-dom";
-import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import axios from "axios";
 import { ethers } from "ethers";
+import { useLocation, useNavigate } from "react-router-dom";
 import contractABI from "../contractABI";
+import "./CSS/LawyerProfile.css";
 
 const LawyerProfile = () => {
-  const theme = useTheme();
-  const location = useLocation();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const location = useLocation();
+  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+
+  // Preset default values for professional info.
   const [profile, setProfile] = useState({
     name: "",
     lawyerId: "",
-    barRegistrationNo: "",
-    yearsOfExperience: "",
+    barRegistrationNo: "BR9140",
+    yearsOfExperience: "10",
     bio: "",
     email: "",
-    location: "",
+    location: "Mumbai, Maharashtra",
     profilePicture: "",
   });
   const [documents, setDocuments] = useState([]);
 
-  const isEditMode = location.state?.mode === 'edit';
-  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  
+  // Toggle edit mode (without changing layout)
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -52,6 +40,7 @@ const LawyerProfile = () => {
       const response = await axios.get("http://localhost:5000/api/lawyer/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // Update profile with fetched values (or keep defaults if not provided)
       setProfile(response.data);
       setLoading(false);
     } catch (err) {
@@ -64,8 +53,7 @@ const LawyerProfile = () => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put("http://localhost:5000/api/lawyer/profile", profile, {
@@ -73,7 +61,8 @@ const LawyerProfile = () => {
       });
       setSuccess("Profile updated successfully");
       setError("");
-      setTimeout(() => navigate('/lawyer-dashboard'), 2000);
+      setIsEditing(false);
+      setTimeout(() => navigate("/lawyer-dashboard"), 2000);
     } catch (err) {
       setError("Failed to update profile");
     }
@@ -86,10 +75,8 @@ const LawyerProfile = () => {
         setError("File size should be less than 5MB");
         return;
       }
-
       const formData = new FormData();
       formData.append("profilePicture", file);
-
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
@@ -103,13 +90,13 @@ const LawyerProfile = () => {
             },
           }
         );
-
         const profilePicture = `http://localhost:5000${response.data.profilePicture}`;
-        setProfile(prev => ({ ...prev, profilePicture }));
+        setProfile((prev) => ({ ...prev, profilePicture }));
         setSuccess("Profile picture updated successfully");
       } catch (err) {
-        setError("Failed to upload profile picture. " +
-          (err.response?.data?.message || err.message || "Unknown error occurred")
+        setError(
+          "Failed to upload profile picture. " +
+            (err.response?.data?.message || err.message || "Unknown error occurred")
         );
       } finally {
         setLoading(false);
@@ -117,252 +104,205 @@ const LawyerProfile = () => {
     }
   };
 
+  // Fetch blockchain documents (unchanged)
   const fetchDocuments = async () => {
     try {
       setLoading(true);
-      
-      // Connect to blockchain
       const provider = new ethers.BrowserProvider(window.ethereum);
       const contract = new ethers.Contract(contractAddress, contractABI, provider);
-      
-      // Get all document hashes from the blockchain
-      // This would require a function in your smart contract to return all document hashes
       const documentHashes = await contract.getAllDocumentHashes();
-      
-      // Process each document
-      const documents = await Promise.all(
+      const docs = await Promise.all(
         documentHashes.map(async (hash) => {
-          // Get document metadata from blockchain
           const metadata = await contract.getDocumentMetadata(hash);
-          
           return {
             ipfsHash: hash,
             title: metadata.title,
             description: metadata.description,
             type: metadata.type,
             date: metadata.date,
-            isVerified: true // Always verified since it's from the blockchain
+            isVerified: true,
           };
         })
       );
-      
-      setDocuments(documents);
+      setDocuments(docs);
       setLoading(false);
     } catch (err) {
-      console.error('Fetch error:', err);
-      setError('Failed to fetch documents from blockchain');
+      console.error("Fetch error:", err);
+      setError("Failed to fetch documents from blockchain");
       setLoading(false);
     }
   };
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
-        <CircularProgress />
-      </Box>
+      <div className="loading-container">
+        <div className="spinner" />
+        <p>Loading...</p>
+      </div>
     );
   }
 
+  const renderMessage = () => {
+    if (error) {
+      return <div className="alert error-alert">{error}</div>;
+    }
+    if (success) {
+      return <div className="alert success-alert">{success}</div>;
+    }
+    return null;
+  };
+
+  // Render the fields inline so the layout remains the same.
+  const renderPersonalInfo = () => (
+    <div className="profile-top-section">
+      <p>
+        <strong>Lawyer ID: </strong>
+        {isEditing ? (
+          <input
+            type="text"
+            name="lawyerId"
+            value={profile.lawyerId}
+            onChange={handleChange}
+          />
+        ) : (
+          profile.lawyerId || "N/A"
+        )}
+      </p>
+      <p>
+        <strong>Email: </strong>
+        {profile.email || "N/A"}
+      </p>
+      <p>
+        <strong>Bio / About Me: </strong>
+        {isEditing ? (
+          <textarea
+            name="bio"
+            rows="4"
+            value={profile.bio}
+            onChange={handleChange}
+          />
+        ) : (
+          profile.bio || "N/A"
+        )}
+      </p>
+    </div>
+  );
+
+  const renderProfessionalInfo = () => (
+    <div className="profile-info-section">
+      <h2>Professional Information</h2>
+      <p>
+        <strong>Bar Registration No: </strong>
+        {isEditing ? (
+          <input
+            type="text"
+            name="barRegistrationNo"
+            value={profile.barRegistrationNo}
+            onChange={handleChange}
+          />
+        ) : (
+          profile.barRegistrationNo || "N/A"
+        )}
+      </p>
+      <p>
+        <strong>Years of Experience: </strong>
+        {isEditing ? (
+          <input
+            type="number"
+            name="yearsOfExperience"
+            value={profile.yearsOfExperience}
+            onChange={handleChange}
+          />
+        ) : (
+          profile.yearsOfExperience || "N/A"
+        )}
+      </p>
+      <p>
+        <strong>Location: </strong>
+        {isEditing ? (
+          <input
+            type="text"
+            name="location"
+            value={profile.location}
+            onChange={handleChange}
+          />
+        ) : (
+          profile.location || "N/A"
+        )}
+      </p>
+    </div>
+  );
+
   return (
-    <Container maxWidth="md">
-      <Paper
-        elevation={3}
-        sx={{
-          p: 4,
-          mt: 4,
-          backgroundColor: "#ffffff",
-          borderRadius: 2,
-          '& .MuiTextField-root': {
-            backgroundColor: '#ffffff',
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                borderColor: 'rgba(255, 255, 255, 0.98)',
-              },
-              '&:hover fieldset': {
-                borderColor: 'rgba(0, 0, 0, 0.87)',
-              },
-              '&.Mui-focused fieldset': {
-                borderColor: '#1976d2',
-              },
-            },
-            '& .MuiInputLabel-root': {
-              color: 'rgba(0, 0, 0, 0.87)',
-            },
-            '& .MuiInputBase-input': {
-              color: 'rgba(0, 0, 0, 0.87)',
-            },
-          },
-        }}
-      >
-        <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
-          <Box sx={{ position: 'relative' }}>
-            <Avatar
-              src={profile.profilePicture || "/default-avatar.png"}
-              sx={{
-                width: 120,
-                height: 120,
-                mb: 2,
-                cursor: isEditMode ? "pointer" : "default",
-                border: `2px solid ${theme.palette.primary.main}`,
-              }}
+    <div className="profile-container">
+      {/* Avatar & Name Section */}
+      <div className="profile-avatar-section">
+        <div className="avatar-wrapper">
+          {profile.profilePicture ? (
+            <img className="avatar-img" src={profile.profilePicture} alt="Profile" />
+          ) : (
+            <div className="avatar-initials">
+              {profile.name ? profile.name.charAt(0).toUpperCase() : "?"}
+            </div>
+          )}
+          {isEditing && (
+            <div className="avatar-upload">
+              <label htmlFor="file-input">&#128247;</label>
+              <input
+                id="file-input"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                style={{ display: "none" }}
+              />
+            </div>
+          )}
+        </div>
+        <div className="profile-title">
+          <h1>Adv. {profile.name || "Lawyer"}</h1>
+          {isEditing ? (
+            <input
+              type="text"
+              name="name"
+              value={profile.name}
+              onChange={handleChange}
+              placeholder="Enter your name"
             />
-            {isEditMode && (
-              <IconButton
-                color="primary"
-                aria-label="upload picture"
-                component="label"
-                sx={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
-                  backgroundColor: "#ffffff",
-                  boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
-                  '&:hover': {
-                    backgroundColor: theme.palette.grey[100],
-                  },
-                }}
-              >
-                <input
-                  hidden
-                  accept="image/*"
-                  type="file"
-                  onChange={handleImageUpload}
-                />
-                <PhotoCamera />
-              </IconButton>
-            )}
-          </Box>
-          <Typography variant="h4" gutterBottom sx={{ color: 'rgba(0, 0, 0, 0.87)' }}>
-            Lawyer Profile
-          </Typography>
-          <Typography variant="subtitle1" sx={{ color: 'rgba(0, 0, 0, 0.6)' }}>
-            {isEditMode ? "Edit your profile information" : "View your profile information"}
-          </Typography>
-        </Box>
+          ) : null}
+        </div>
+      </div>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        
-        {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            {success}
-          </Alert>
-        )}
+      {renderMessage()}
 
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Name"
-                name="name"
-                value={profile.name}
-                onChange={handleChange}
-                disabled={!isEditMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Lawyer ID"
-                name="lawyerId"
-                value={profile.lawyerId}
-                onChange={handleChange}
-                disabled={!isEditMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Bar Registration Number"
-                name="barRegistrationNo"
-                value={profile.barRegistrationNo}
-                onChange={handleChange}
-                disabled={!isEditMode}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Years of Experience"
-                name="yearsOfExperience"
-                type="number"
-                value={profile.yearsOfExperience}
-                onChange={handleChange}
-                disabled={!isEditMode}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Email"
-                name="email"
-                value={profile.email}
-                disabled
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Location"
-                name="location"
-                value={profile.location}
-                onChange={handleChange}
-                disabled={!isEditMode}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Bio"
-                name="bio"
-                multiline
-                rows={4}
-                value={profile.bio}
-                onChange={handleChange}
-                disabled={!isEditMode}
-              />
-            </Grid>
-          </Grid>
+      {/* Profile Details Section */}
+      <div className="profile-details-section">
+        {renderPersonalInfo()}
+        {renderProfessionalInfo()}
 
-          <Divider sx={{ my: 3 }} />
-
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/lawyer-dashboard')}
-              sx={{
-                color: theme.palette.primary.main,
-                borderColor: theme.palette.primary.main,
-                '&:hover': {
-                  borderColor: theme.palette.primary.dark,
-                  backgroundColor: 'rgba(25, 118, 210, 0.04)',
-                },
-              }}
-            >
-              Back to Dashboard
-            </Button>
-            {isEditMode && (
-              <Button
-                variant="contained"
-                type="submit"
-                sx={{
-                  backgroundColor: theme.palette.primary.main,
-                  '&:hover': {
-                    backgroundColor: theme.palette.primary.dark,
-                  },
-                }}
-              >
+        {/* Toggle/Action Buttons */}
+        <div className="update-btn-container">
+          {isEditing ? (
+            <>
+              <button className="secondary-btn" onClick={() => setIsEditing(false)}>
+                Cancel
+              </button>
+              <button className="primary-btn" onClick={handleSubmit}>
                 Save Changes
-              </Button>
-            )}
-          </Box>
-        </form>
-      </Paper>
-    </Container>
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="primary-btn" onClick={() => setIsEditing(true)}>
+                Edit Profile
+              </button>
+              <button className="secondary-btn" onClick={() => navigate("/lawyer-dashboard")}>
+                Back to Dashboard
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

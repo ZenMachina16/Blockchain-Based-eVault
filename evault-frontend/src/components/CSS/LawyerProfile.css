@@ -1,0 +1,231 @@
+/* Basic resets / font style */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+}
+
+body {
+    background-color: #e8e8e8;
+}
+
+/* Container for the entire profile page */
+.profile-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background-color: #587392;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+/* Avatar and name section */
+.profile-avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Avatar wrapper for the circular image or initials */
+.avatar-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 1rem;
+}
+
+/* Circle with image */
+.avatar-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #1976d2;
+}
+
+/* Circle with text initials if no image */
+.avatar-initials {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #1976d2;
+    color: #fff;
+    font-size: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    border: 2px solid #1976d2;
+}
+
+/* Upload icon for images */
+.avatar-upload {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+}
+
+.avatar-upload label {
+    font-size: 1.5rem;
+    color: #1976d2;
+}
+
+/* Title below the avatar */
+.profile-title h1 {
+    font-size: 1.75rem;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+/* Style inputs and textareas to blend in */
+.profile-details-section input,
+.profile-details-section textarea {
+    border: 1px solid #ccc;
+    padding: 0.25rem;
+    font-size: 1rem;
+    border-radius: 4px;
+}
+
+/* Alert messages for error/success */
+.alert {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.error-alert {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.success-alert {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* Loading spinner container */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 5rem;
+    color: #666;
+}
+
+.spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid #999;
+    border-top: 4px solid transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* The main content for the profile details */
+.profile-details-section {
+    margin-top: 1rem;
+}
+
+/* Sections for static personal and professional info */
+.profile-top-section,
+.profile-info-section {
+    background: linear-gradient(-90deg, #cee5ff,  #E5F1FF, #f0f5fa);
+    padding: 1rem;
+    border-radius: 4px;
+    border : 1px solid #4175AF;
+    margin-bottom: 1.5rem;
+}
+
+.profile-top-section p,
+.profile-info-section p {
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    color: #444;
+}
+
+.profile-info-section h2 {
+    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+/* Button container */
+.update-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.primary-btn,
+.secondary-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-left: 1rem;
+    border: none;
+}
+
+.primary-btn {
+        background: linear-gradient(-90deg, #172AA7, #4C5DCB, #737FD0);
+    color: white;
+}
+
+.primary-btn:hover {
+            background: linear-gradient(90deg, #172AA7, #4C5DCB, #737FD0);
+          
+}
+
+.secondary-btn {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.secondary-btn:hover {
+    background-color: #cacaca;
+}
+
+/* Form edit styles, if needed */
+.form-section {
+    background-color: #f7f7f7;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.form-section h3 {
+    margin-bottom: 0.75rem;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    color: #555;
+}
+
+.button-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}

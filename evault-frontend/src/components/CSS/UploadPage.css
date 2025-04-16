@@ -1,0 +1,121 @@
+/* Container setup */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    min-height: 80vh;
+    font-family: Arial, sans-serif;
+    background-color: #f2f4f7;
+}
+
+/* Header styles */
+.header {
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    text-align: center;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 1rem;
+    width: 100%;
+}
+
+/* Form styles */
+.form {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    padding: 50px 90px;
+     background: linear-gradient(-90deg, #3786CB , #99B9D5, #D0E9FF );
+    border-radius: 8px;
+    box-shadow: inset -8px 8px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Drag and Drop area styles */
+.drag-drop-area {
+    border: 3px dashed #3e3e3e;
+    border-radius: 4px;
+    padding: 2rem;
+    text-align: center;
+    color: #19232d;
+    margin-bottom: 1rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    position: relative;
+}
+
+.drag-drop-area.active {
+    background-color: #eaf4ff;
+    border-color: #3498db;
+}
+
+/* Label styles for file selection */
+.label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.file-upload-label {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Hide the default file input appearance */
+.file-input {
+    display: none;
+}
+
+/* Selected file text */
+.selected-file {
+    margin-top: 0.5rem;
+    color: #2c3e50;
+}
+
+/* Submit button styles */
+.submit-button {
+        background: linear-gradient(-90deg, #17A71D, #44AE48, #55D15A);
+    color: #fff;
+    border: none;
+    padding: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    box-shadow: inset -8px 8px 8px rgba(0, 0, 0, 0.1);
+}
+
+.submit-button:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* Message styles */
+.message {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 4px;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+}
+
+.message.error {
+    color: #e74c3c;
+    background-color: #fde8e8;
+}
+
+.message.success {
+    color: #27ae60;
+    background-color: #e6ffef;
+}
+
+/* Footer styles */
+.footer {
+    margin-top: 2rem;
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
