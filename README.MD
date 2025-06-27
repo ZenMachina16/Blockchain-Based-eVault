@@ -116,6 +116,6 @@ The architecture consists of the following modules:
 
 ## 💡 Inspiration
 
-This project was inspired by the limitations of traditional legal data storage, aiming to deliver a tru
+This project was inspired by the limitations of traditional legal data storage, aiming to deliver a trustless, efficient, and future-ready solution for modern law practices.
 
 
