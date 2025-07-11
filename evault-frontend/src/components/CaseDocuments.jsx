@@ -17,13 +17,16 @@ import {
   Alert,
   Paper,
   Tooltip,
+  Link
 } from '@mui/material';
 import { Delete as DeleteIcon, Download as DownloadIcon, Upload as UploadIcon, Verified as VerifiedIcon } from '@mui/icons-material';
 import axios from 'axios';
 import { ethers } from 'ethers';
 import contractABI from '../contractABI';
+import { useNavigate } from 'react-router-dom';
 
 const CaseDocuments = ({ caseId, userRole }) => {
+  const navigate = useNavigate();
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,13 +37,15 @@ const CaseDocuments = ({ caseId, userRole }) => {
   const [documentDescription, setDocumentDescription] = useState('');
   const [documentType, setDocumentType] = useState('');
   const [verifying, setVerifying] = useState(false);
+  const [isApprovedLawyer, setIsApprovedLawyer] = useState(false);
+  const [needsApproval, setNeedsApproval] = useState(false);
 
-  // Use the correct contract address from your environment variables - hardcoded for testing
-  const contractAddress = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"; // Latest deployed contract
+  // Use the correct contract address from environment variables
+  const contractAddress = process.env.REACT_APP_NAVINEVAULT_CONTRACT_ADDRESS || "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
 
   useEffect(() => {
-    // Register the current user as a lawyer when component mounts
-    const registerAsLawyer = async () => {
+    // Check if the user is a properly approved lawyer
+    const checkLawyerStatus = async () => {
       try {
         if (!window.ethereum) return;
         
@@ -55,30 +60,20 @@ const CaseDocuments = ({ caseId, userRole }) => {
         
         // Check if already a lawyer
         const isLawyer = await contract.isLawyer(userAddress);
-        console.log("User is lawyer:", isLawyer);
+        console.log("User is approved lawyer:", isLawyer);
         
-        if (!isLawyer) {
-          // Get the contract owner
-          const owner = await contract.owner();
-          console.log("Contract owner:", owner);
-          
-          if (userAddress.toLowerCase() === owner.toLowerCase()) {
-            // Current user is the owner, can directly register as lawyer
-            const tx = await contract.addLawyer(userAddress);
-            await tx.wait();
-            console.log("Successfully registered as lawyer");
-          } else {
-            console.log("User is not the owner, needs to be registered by owner");
-          }
+        setIsApprovedLawyer(isLawyer);
+        if (userRole === 'lawyer' && !isLawyer) {
+          setNeedsApproval(true);
         }
       } catch (error) {
-        console.error("Error registering as lawyer:", error);
+        console.error("Error checking lawyer status:", error);
       }
     };
     
-    registerAsLawyer();
+    checkLawyerStatus();
     fetchDocuments();
-  }, [caseId]);
+  }, [caseId, contractAddress, userRole]);
 
   const fetchDocuments = async () => {
     try {
@@ -170,6 +165,12 @@ const CaseDocuments = ({ caseId, userRole }) => {
       return;
     }
 
+    // Check if user is an approved lawyer before allowing upload
+    if (!isApprovedLawyer && userRole === 'lawyer') {
+      setError('You need to be an approved lawyer to upload documents. Please apply for approval first.');
+      return;
+    }
+
     setUploading(true);
     try {
       // Check if window.ethereum is available
@@ -206,28 +207,6 @@ const CaseDocuments = ({ caseId, userRole }) => {
       // Now try to upload the file
       try {
         console.log("Uploading file...");
-        
-        // Force register as lawyer (FOR TESTING ONLY)
-        const userAddress = await signer.getAddress();
-        const isLawyer = await contract.isLawyer(userAddress);
-        
-        if (!isLawyer) {
-          try {
-            console.log("Attempting to register as lawyer using Hardhat default account...");
-            // Use hardhat's first account private key (ONLY FOR LOCAL TESTING)
-            const ownerPrivateKey = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
-            const ownerWallet = new ethers.Wallet(ownerPrivateKey, provider);
-            const ownerContract = new ethers.Contract(contractAddress, contractABI, ownerWallet);
-            
-            const tx = await ownerContract.addLawyer(userAddress);
-            await tx.wait();
-            console.log("Successfully registered as lawyer");
-          } catch (err) {
-            console.error("Failed to register as lawyer:", err);
-            setError("Failed to register as lawyer: " + err.message);
-            return;
-          }
-        }
         
         const uploadTx = await contract.uploadFile(
           ipfsHash,
@@ -273,6 +252,12 @@ const CaseDocuments = ({ caseId, userRole }) => {
   };
 
   const handleDelete = async (documentId) => {
+    // Check if user is an approved lawyer before allowing delete
+    if (!isApprovedLawyer && userRole === 'lawyer') {
+      setError('You need to be an approved lawyer to delete documents.');
+      return;
+    }
+
     try {
       // Get contract instance using ethers.js v6 syntax
       const provider = new ethers.BrowserProvider(window.ethereum);
@@ -289,6 +274,11 @@ const CaseDocuments = ({ caseId, userRole }) => {
     }
   };
 
+  // Redirect to lawyer registration if not approved
+  const navigateToLawyerRegistration = () => {
+    navigate('/lawyer-registration');
+  };
+
   if (loading) {
     return <CircularProgress />;
   }
@@ -298,19 +288,45 @@ const CaseDocuments = ({ caseId, userRole }) => {
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h6">Case Documents</Typography>
         {userRole === 'lawyer' && (
-          <Button
-            variant="contained"
-            startIcon={<UploadIcon />}
-            onClick={() => setOpenUpload(true)}
-          >
-            Upload Document
-          </Button>
+          <>
+            {isApprovedLawyer ? (
+              <Button
+                variant="contained"
+                startIcon={<UploadIcon />}
+                onClick={() => setOpenUpload(true)}
+              >
+                Upload Document
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={navigateToLawyerRegistration}
+              >
+                Apply for Lawyer Approval
+              </Button>
+            )}
+          </>
         )}
       </Box>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
+        </Alert>
+      )}
+
+      {needsApproval && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          Your account is not registered as an approved lawyer. You need to apply for approval before uploading documents.
+          <Button 
+            color="inherit" 
+            size="small" 
+            onClick={navigateToLawyerRegistration}
+            sx={{ ml: 2 }}
+          >
+            Apply Now
+          </Button>
         </Alert>
       )}
 
@@ -343,7 +359,7 @@ const CaseDocuments = ({ caseId, userRole }) => {
               >
                 <DownloadIcon />
               </IconButton>
-              {userRole === 'lawyer' && (
+              {userRole === 'lawyer' && isApprovedLawyer && (
                 <IconButton
                   edge="end"
                   aria-label="delete"

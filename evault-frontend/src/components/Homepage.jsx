@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./CSS/Homepage.css"; // Import the CSS file
+import "./CSS/Homepage.css"; // Import the main CSS file
+import "./CSS/LawyerRegistration.css"; // Import the lawyer registration CSS file
 
 const Homepage = () => {
   const navigate = useNavigate(); // Initialize the navigate function
@@ -24,6 +25,20 @@ const Homepage = () => {
           >
             <span>GET STARTED</span>
           </button>
+          <div className="additional-links">
+            <button 
+              onClick={() => navigate("/lawyer-registration")} 
+              className="secondary-button"
+            >
+              Apply as Lawyer
+            </button>
+            <button 
+              onClick={() => navigate("/admin-dashboard")} 
+              className="secondary-button"
+            >
+              Admin Portal
+            </button>
+          </div>
         </div>
       </div>
 
@@ -39,7 +54,7 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Updated Features Section */}
       <section id="features">
         <div id="feature-head">FEATURES</div>
         <div className="feature-grid">
@@ -92,6 +107,18 @@ const Homepage = () => {
             Ethereum Blockchain Security
           </div>
         </div>
+        
+        {/* New Lawyer Registration Callout */}
+        <div className="registration-callout">
+          <h2>Are you a lawyer?</h2>
+          <p>Apply for verified lawyer status to securely manage legal documents on the blockchain.</p>
+          <button 
+            onClick={() => navigate("/lawyer-registration")} 
+            className="registration-button"
+          >
+            Apply for Lawyer Verification
+          </button>
+        </div>
       </section>
 
       {/* Support Center */}
@@ -116,7 +143,7 @@ const Homepage = () => {
             />
             <h2>Email Us</h2>
             <p>
-              <i>Send us a message, and we’ll respond shortly</i>
+              <i>Send us a message, and we'll respond shortly</i>
             </p>
           </div>
           <div className="support-box">

@@ -12,6 +12,10 @@ import {
   Alert,
   IconButton,
   Divider,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -38,12 +42,27 @@ const LawyerProfile = () => {
     profilePicture: "",
   });
   const [documents, setDocuments] = useState([]);
+  const [userAddress, setUserAddress] = useState("");
+  const [contractAddress, setContractAddress] = useState("");
+  const [isLawyer, setIsLawyer] = useState(false);
+  
+  const [profileData, setProfileData] = useState({
+    fullName: "",
+    barId: "",
+    email: "",
+    phone: "",
+    specialization: "",
+    yearsOfExperience: "",
+    firmName: "",
+    officeAddress: "",
+    bio: ""
+  });
 
   const isEditMode = location.state?.mode === 'edit';
-  const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
   useEffect(() => {
     fetchProfile();
+    checkLawyerStatus();
   }, []);
 
   const fetchProfile = async () => {
@@ -60,22 +79,101 @@ const LawyerProfile = () => {
     }
   };
 
-  const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
+  const checkLawyerStatus = async () => {
+    try {
+      if (!window.ethereum) {
+        throw new Error("MetaMask is not installed. Please install it to continue.");
+      }
+      
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      let accounts = await provider.listAccounts();
+      
+      if (accounts.length === 0) {
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          accounts = await provider.listAccounts();
+        } catch (connErr) {
+          throw new Error('Failed to connect to MetaMask');
+        }
+      }
+      
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+      setUserAddress(address);
+      
+      // Get contract address from .env
+      const contractAddr = process.env.REACT_APP_NAVINEVAULT_CONTRACT_ADDRESS || "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+      setContractAddress(contractAddr);
+      
+      const contract = new ethers.Contract(contractAddr, contractABI, signer);
+      
+      // Check if user is a lawyer
+      const lawyerStatus = await contract.isLawyer(address);
+      setIsLawyer(lawyerStatus);
+      
+      if (!lawyerStatus) {
+        setError("You are not registered as a lawyer. Please apply first.");
+      }
+      
+      // Load existing data if available
+      try {
+        const details = await contract.getLawyerApplicationDetails(address);
+        setProfileData(prev => ({
+          ...prev, 
+          fullName: details.name || "",
+          barId: details.barNumber || "",
+          email: details.email || ""
+        }));
+      } catch (error) {
+        console.error("Error loading lawyer details:", error);
+      }
+      
+    } catch (err) {
+      console.error("Error checking lawyer status:", err);
+      setError(err.message || "Failed to check lawyer status");
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleChange = (e) => {
+    setProfileData({
+      ...profileData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const submitProfile = async () => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      const token = localStorage.getItem("token");
-      await axios.put("http://localhost:5000/api/lawyer/profile", profile, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setSuccess("Profile updated successfully");
-      setError("");
-      setTimeout(() => navigate('/lawyer-dashboard'), 2000);
+      // Basic validation
+      const requiredFields = ['fullName', 'barId', 'email', 'phone', 'specialization'];
+      for (const field of requiredFields) {
+        if (!profileData[field]) {
+          throw new Error(`Please fill in your ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+        }
+      }
+      
+      // In a real application, we would save this profile data to the blockchain
+      // For now, we're just simulating success
+      
+      console.log("Profile data to save:", profileData);
+      
+      // Simulated API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setSuccess(true);
+      
+      // Redirect to lawyer dashboard after 2 seconds
+      setTimeout(() => {
+        navigate("/lawyer-dashboard");
+      }, 2000);
+      
     } catch (err) {
-      setError("Failed to update profile");
+      console.error("Error submitting profile:", err);
+      setError(err.message || "Failed to submit profile");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,6 +257,24 @@ const LawyerProfile = () => {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!isLawyer && !loading) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Alert severity="error">
+          You are not registered as a lawyer. Please complete the lawyer application process first.
+          <Button 
+            variant="contained" 
+            color="primary" 
+            sx={{ mt: 2, ml: 2 }}
+            onClick={() => navigate("/lawyer-registration")}
+          >
+            Go to Registration
+          </Button>
+        </Alert>
       </Box>
     );
   }
@@ -252,114 +368,149 @@ const LawyerProfile = () => {
           </Alert>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={submitProfile}>
           <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Personal Information
+              </Typography>
+            </Grid>
+            
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Name"
-                name="name"
-                value={profile.name}
+                label="Full Name"
+                name="fullName"
+                value={profileData.fullName}
                 onChange={handleChange}
-                disabled={!isEditMode}
+                required
               />
             </Grid>
+            
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Lawyer ID"
-                name="lawyerId"
-                value={profile.lawyerId}
+                label="Bar ID/License Number"
+                name="barId"
+                value={profileData.barId}
                 onChange={handleChange}
-                disabled={!isEditMode}
+                required
               />
             </Grid>
+            
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Bar Registration Number"
-                name="barRegistrationNo"
-                value={profile.barRegistrationNo}
+                label="Email Address"
+                name="email"
+                type="email"
+                value={profileData.email}
                 onChange={handleChange}
-                disabled={!isEditMode}
+                required
               />
             </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Phone Number"
+                name="phone"
+                value={profileData.phone}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Professional Information
+              </Typography>
+            </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Specialization</InputLabel>
+                <Select
+                  name="specialization"
+                  value={profileData.specialization}
+                  label="Specialization"
+                  onChange={handleChange}
+                >
+                  <MenuItem value="Corporate Law">Corporate Law</MenuItem>
+                  <MenuItem value="Criminal Law">Criminal Law</MenuItem>
+                  <MenuItem value="Family Law">Family Law</MenuItem>
+                  <MenuItem value="Intellectual Property">Intellectual Property</MenuItem>
+                  <MenuItem value="Real Estate">Real Estate</MenuItem>
+                  <MenuItem value="Tax Law">Tax Law</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 label="Years of Experience"
                 name="yearsOfExperience"
                 type="number"
-                value={profile.yearsOfExperience}
+                value={profileData.yearsOfExperience}
                 onChange={handleChange}
-                disabled={!isEditMode}
               />
             </Grid>
-            <Grid item xs={12}>
+            
+            <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Email"
-                name="email"
-                value={profile.email}
-                disabled
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Location"
-                name="location"
-                value={profile.location}
+                label="Firm Name"
+                name="firmName"
+                value={profileData.firmName}
                 onChange={handleChange}
-                disabled={!isEditMode}
               />
             </Grid>
+            
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Office Address"
+                name="officeAddress"
+                value={profileData.officeAddress}
+                onChange={handleChange}
+              />
+            </Grid>
+            
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Bio"
+                label="Professional Bio"
                 name="bio"
+                value={profileData.bio}
+                onChange={handleChange}
                 multiline
                 rows={4}
-                value={profile.bio}
-                onChange={handleChange}
-                disabled={!isEditMode}
+                placeholder="Tell clients about your background, experience, and approach"
               />
             </Grid>
+            
+            <Grid item xs={12}>
+              <Box display="flex" justifyContent="space-between" mt={2}>
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate("/")}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={submitProfile}
+                  disabled={loading}
+                >
+                  {loading ? <CircularProgress size={24} /> : "Save Profile"}
+                </Button>
+              </Box>
+            </Grid>
           </Grid>
-
-          <Divider sx={{ my: 3 }} />
-
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button
-              variant="outlined"
-              onClick={() => navigate('/lawyer-dashboard')}
-              sx={{
-                color: theme.palette.primary.main,
-                borderColor: theme.palette.primary.main,
-                '&:hover': {
-                  borderColor: theme.palette.primary.dark,
-                  backgroundColor: 'rgba(25, 118, 210, 0.04)',
-                },
-              }}
-            >
-              Back to Dashboard
-            </Button>
-            {isEditMode && (
-              <Button
-                variant="contained"
-                type="submit"
-                sx={{
-                  backgroundColor: theme.palette.primary.main,
-                  '&:hover': {
-                    backgroundColor: theme.palette.primary.dark,
-                  },
-                }}
-              >
-                Save Changes
-              </Button>
-            )}
-          </Box>
         </form>
       </Paper>
     </Container>

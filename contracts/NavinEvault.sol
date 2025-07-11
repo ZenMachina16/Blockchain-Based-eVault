@@ -5,6 +5,21 @@
         address public owner;
         mapping(address => bool) private lawyers;
         mapping(address => bool) private clients;
+        mapping(address => bool) public admins;
+        mapping(address => bool) public pendingLawyers;
+        mapping(address => LawyerApplication) public lawyerApplications;
+
+        struct LawyerApplication {
+            string name;
+            string barNumber;
+            string email;
+            string additionalInfo;
+            uint256 applicationDate;
+            bool isReviewed;
+            bool isApproved;
+            address reviewedBy;
+            uint256 reviewDate;
+        }
 
         struct CaseFile {
             address uploader;
@@ -56,6 +71,11 @@
         event DocumentStatusChanged(uint256 indexed fileId, string newStatus);
         event DocumentPermissionGranted(uint256 indexed fileId, address user);
         event DocumentPermissionRevoked(uint256 indexed fileId, address user);
+        event LawyerRequestSubmitted(address indexed applicant, string name, string barNumber);
+        event LawyerApproved(address indexed lawyer, address indexed approvedBy);
+        event LawyerRejected(address indexed applicant, address indexed rejectedBy);
+        event AdminAdded(address indexed admin);
+        event AdminRemoved(address indexed admin);
 
         modifier onlyOwner() {
             require(msg.sender == owner, "Only the owner can perform this action");
@@ -72,11 +92,29 @@
             _;
         }
 
-        constructor() {
-            owner = msg.sender;
+        modifier onlyAdmin() {
+            require(admins[msg.sender], "Only admins can perform this action");
+            _;
         }
 
-        // Register lawyers and clients
+        constructor() {
+            owner = msg.sender;
+            admins[msg.sender] = true;
+        }
+
+        function addAdmin(address _admin) public onlyOwner {
+            require(!admins[_admin], "Already an admin");
+            admins[_admin] = true;
+            emit AdminAdded(_admin);
+        }
+
+        function removeAdmin(address _admin) public onlyOwner {
+            require(_admin != owner, "Cannot remove owner as admin");
+            require(admins[_admin], "Not an admin");
+            admins[_admin] = false;
+            emit AdminRemoved(_admin);
+        }
+
         function addLawyer(address _lawyer) public onlyOwner {
             lawyers[_lawyer] = true;
         }
@@ -101,7 +139,6 @@
             return clients[_client];
         }
 
-        // Allow authorized users (lawyers or clients) to upload files
         function uploadFile(
             string memory ipfsHash,
             string memory title,
@@ -122,7 +159,6 @@
             totalCaseFiles++;
             address linkedLawyer = lawyers[msg.sender] ? msg.sender : address(0);
             
-            // Create an empty array for linkedClients if none exist yet
             address[] memory emptyClientArray = new address[](0);
             
             caseFiles[totalCaseFiles] = CaseFile({
@@ -164,7 +200,6 @@
             );
         }
 
-        // Link clients
         function linkClients(uint256 _fileId, address[] memory _clients) public onlyLawyer {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(caseFiles[_fileId].linkedLawyer == msg.sender, "You are not the linked lawyer for this case");
@@ -172,26 +207,20 @@
             for (uint256 i = 0; i < _clients.length; i++) {
                 address client = _clients[i];
                 require(!linkedClientsMap[_fileId][client], "Client is already linked to this case");
-                linkedClientsMap[_fileId][client] = true; // Link client
+                linkedClientsMap[_fileId][client] = true;
                 
-                // Add to the clients array
                 address[] storage currentClients = caseFiles[_fileId].linkedClients;
-                // Create a new array with one more element
                 address[] memory newClients = new address[](currentClients.length + 1);
-                // Copy existing clients
                 for (uint256 j = 0; j < currentClients.length; j++) {
                     newClients[j] = currentClients[j];
                 }
-                // Add the new client
                 newClients[currentClients.length] = client;
-                // Update the storage array
                 caseFiles[_fileId].linkedClients = newClients;
                 
                 emit ClientLinked(_fileId, client);
             }
         }
 
-        // Replace lawyer for the case
         function replaceLawyer(uint256 _fileId, address _newLawyer) public {
             require(
                 lawyers[msg.sender] || caseFiles[_fileId].linkedLawyer == msg.sender,
@@ -204,7 +233,6 @@
             emit LawyerReplaced(_fileId, _newLawyer);
         }
 
-        // Clients or lawyers can get case file details
         function getFile(uint256 _fileId) public view returns (
             address uploader,
             string memory ipfsHash,
@@ -256,11 +284,9 @@
             );
         }
 
-        // Search by title (clients can search for their own cases)
         function searchByTitle(string memory _title) public view returns (CaseFile[] memory) {
             uint256 matchCount = 0;
 
-            // First, count how many case files match the title and are linked to the client
             for (uint256 i = 1; i <= totalCaseFiles; i++) {
                 if (
                     keccak256(abi.encodePacked(caseFiles[i].title)) == keccak256(abi.encodePacked(_title)) &&
@@ -270,11 +296,9 @@
                 }
             }
 
-            // Create an array to hold the matching case files
             CaseFile[] memory matchingFiles = new CaseFile[](matchCount);
             uint256 index = 0;
 
-            // Populate the matchingFiles array with the matching case files where the client is linked
             for (uint256 i = 1; i <= totalCaseFiles; i++) {
                 if (
                     keccak256(abi.encodePacked(caseFiles[i].title)) == keccak256(abi.encodePacked(_title)) &&
@@ -288,7 +312,6 @@
             return matchingFiles;
         }
 
-        // New function to update document
         function updateDocument(
             uint256 _fileId,
             string memory _newIpfsHash,
@@ -313,7 +336,6 @@
             emit DocumentUpdated(_fileId, _newIpfsHash, file.version);
         }
 
-        // New function to verify document
         function verifyDocument(uint256 _fileId) public onlyLawyer {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             
@@ -324,7 +346,6 @@
             emit DocumentVerified(_fileId, msg.sender);
         }
 
-        // New function to change document status
         function changeDocumentStatus(uint256 _fileId, string memory _newStatus) public {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(
@@ -339,7 +360,6 @@
             emit DocumentStatusChanged(_fileId, _newStatus);
         }
 
-        // New function to grant document permissions
         function grantDocumentPermission(uint256 _fileId, address _user) public {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(
@@ -351,7 +371,6 @@
             emit DocumentPermissionGranted(_fileId, _user);
         }
 
-        // New function to revoke document permissions
         function revokeDocumentPermission(uint256 _fileId, address _user) public {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(
@@ -363,7 +382,6 @@
             emit DocumentPermissionRevoked(_fileId, _user);
         }
 
-        // New function to get document version history
         function getDocumentVersions(uint256 _fileId) public view returns (string[] memory) {
             require(_fileId > 0 && _fileId <= totalCaseFiles, "Invalid file ID");
             require(
@@ -383,18 +401,12 @@
             return versions;
         }
 
-        /**
-         * @dev Returns all document hashes stored in the contract
-         * @return Array of IPFS hashes
-         */
         function getAllDocumentHashes() public view returns (string[] memory) {
-            // If there are no documents, return an empty array
             if (totalCaseFiles == 0) {
                 string[] memory emptyHashes = new string[](0);
                 return emptyHashes;
             }
             
-            // Count non-empty hashes
             uint256 nonEmptyCount = 0;
             for (uint256 i = 1; i <= totalCaseFiles; i++) {
                 if (bytes(caseFiles[i].ipfsHash).length > 0) {
@@ -402,13 +414,11 @@
                 }
             }
 
-            // If no non-empty hashes, return an empty array
             if (nonEmptyCount == 0) {
                 string[] memory emptyHashes = new string[](0);
                 return emptyHashes;
             }
 
-            // Create array with only non-empty hashes
             string[] memory hashes = new string[](nonEmptyCount);
             uint256 index = 0;
             for (uint256 i = 1; i <= totalCaseFiles; i++) {
@@ -420,21 +430,12 @@
             return hashes;
         }
 
-        /**
-         * @dev Returns metadata for a specific document hash
-         * @param hash The IPFS hash of the document
-         * @return title The document title
-         * @return description The document description
-         * @return fileType The document type
-         * @return date The document date
-         */
         function getDocumentMetadata(string memory hash) public view returns (
             string memory title,
             string memory description,
             string memory fileType,
             string memory date
         ) {
-            // Find the document with the given hash
             for (uint256 i = 0; i < totalCaseFiles; i++) {
                 if (keccak256(bytes(caseFiles[i].ipfsHash)) == keccak256(bytes(hash))) {
                     return (
@@ -446,25 +447,17 @@
                 }
             }
             
-            // If not found, return empty strings
             return ("", "", "", "");
         }
 
-        /**
-         * @dev Deletes a document from the contract
-         * @param documentId The IPFS hash of the document to delete
-         */
         function deleteDocument(string memory documentId) public {
-            // Find the document with the given hash
             for (uint256 i = 0; i < totalCaseFiles; i++) {
                 if (keccak256(bytes(caseFiles[i].ipfsHash)) == keccak256(bytes(documentId))) {
-                    // Only allow deletion by the uploader or the owner
                     require(
                         msg.sender == caseFiles[i].uploader || msg.sender == owner,
                         "Only the uploader or owner can delete this document"
                     );
                     
-                    // Mark as deleted by setting the hash to empty
                     caseFiles[i].ipfsHash = "";
                     caseFiles[i].documentStatus = "DELETED";
                     caseFiles[i].lastModified = block.timestamp;
@@ -473,7 +466,111 @@
                 }
             }
             
-            // If not found, revert
             revert("Document not found");
+        }
+
+        function requestLawyerStatus(
+            string memory _name,
+            string memory _barNumber,
+            string memory _email,
+            string memory _additionalInfo
+        ) public {
+            require(!isLawyer(msg.sender), "Already a lawyer");
+            require(!pendingLawyers[msg.sender], "Request already pending");
+            
+            pendingLawyers[msg.sender] = true;
+            lawyerApplications[msg.sender] = LawyerApplication({
+                name: _name,
+                barNumber: _barNumber,
+                email: _email,
+                additionalInfo: _additionalInfo,
+                applicationDate: block.timestamp,
+                isReviewed: false,
+                isApproved: false,
+                reviewedBy: address(0),
+                reviewDate: 0
+            });
+            
+            emit LawyerRequestSubmitted(msg.sender, _name, _barNumber);
+        }
+
+        function approveLawyer(address _lawyer) public onlyAdmin {
+            require(pendingLawyers[_lawyer], "No pending request");
+            require(!lawyerApplications[_lawyer].isReviewed, "Already reviewed");
+            
+            lawyers[_lawyer] = true;
+            pendingLawyers[_lawyer] = false;
+            
+            lawyerApplications[_lawyer].isReviewed = true;
+            lawyerApplications[_lawyer].isApproved = true;
+            lawyerApplications[_lawyer].reviewedBy = msg.sender;
+            lawyerApplications[_lawyer].reviewDate = block.timestamp;
+            
+            emit LawyerApproved(_lawyer, msg.sender);
+        }
+
+        function rejectLawyer(address _lawyer) public onlyAdmin {
+            require(pendingLawyers[_lawyer], "No pending request");
+            require(!lawyerApplications[_lawyer].isReviewed, "Already reviewed");
+            
+            pendingLawyers[_lawyer] = false;
+            
+            lawyerApplications[_lawyer].isReviewed = true;
+            lawyerApplications[_lawyer].isApproved = false;
+            lawyerApplications[_lawyer].reviewedBy = msg.sender;
+            lawyerApplications[_lawyer].reviewDate = block.timestamp;
+            
+            emit LawyerRejected(_lawyer, msg.sender);
+        }
+        
+        function getLawyerApplicationDetails(address _lawyer) public view returns (
+            string memory name,
+            string memory barNumber,
+            string memory email,
+            string memory additionalInfo,
+            uint256 applicationDate,
+            bool isReviewed,
+            bool isApproved,
+            address reviewedBy,
+            uint256 reviewDate
+        ) {
+            require(admins[msg.sender] || msg.sender == _lawyer, "Not authorized");
+            
+            LawyerApplication storage application = lawyerApplications[_lawyer];
+            return (
+                application.name,
+                application.barNumber,
+                application.email,
+                application.additionalInfo,
+                application.applicationDate,
+                application.isReviewed,
+                application.isApproved,
+                application.reviewedBy,
+                application.reviewDate
+            );
+        }
+        
+        function getPendingLawyerApplications() public view onlyAdmin returns (address[] memory) {
+            uint256 count = 0;
+            
+            for (uint256 i = 0; i < totalCaseFiles; i++) {
+                address applicant = caseFiles[i].uploader;
+                if (pendingLawyers[applicant] && !lawyerApplications[applicant].isReviewed) {
+                    count++;
+                }
+            }
+            
+            address[] memory pendingApplicants = new address[](count);
+            uint256 index = 0;
+            
+            for (uint256 i = 0; i < totalCaseFiles; i++) {
+                address applicant = caseFiles[i].uploader;
+                if (pendingLawyers[applicant] && !lawyerApplications[applicant].isReviewed) {
+                    pendingApplicants[index] = applicant;
+                    index++;
+                }
+            }
+            
+            return pendingApplicants;
         }
     }
