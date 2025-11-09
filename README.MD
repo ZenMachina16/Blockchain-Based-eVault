@@ -25,6 +25,8 @@ The architecture consists of the following modules:
 - **Decentralized Storage**: Documents are stored on IPFS using the Pinata API.
 - **AI Backend**: NLP module summarizes uploaded legal documents using transformer models (e.g., BERT, GPT).
 - **Database**: A NoSQL store maintains metadata and links between IPFS hashes and smart contract records.
+![App Screenshot](./Screenshot%202025-11-09%20202040.png)
+
 
 ---
 
