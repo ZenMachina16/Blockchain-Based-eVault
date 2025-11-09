@@ -1,5 +1,11 @@
 # 🛡️ Unified Blockchain-Based Legal Document Management (eVault)
 
+# Demo Video
+
+🎥 **Watch the demo here:**  
+[https://www.loom.com/share/c75018efbb06459fa6046d4d87f1ed9b](https://www.loom.com/share/c75018efbb06459fa6046d4d87f1ed9b)
+
+
 > A decentralized, AI-integrated system for secure and transparent legal document storage, built using Ethereum, IPFS, and NLP-based summarization.
 
 ---
